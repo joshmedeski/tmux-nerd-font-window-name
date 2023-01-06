@@ -1,3 +1,5 @@
+⚠️ This does not work yet! See https://github.com/tmux-plugins/tpm/issues/240
+
 ![thumbnail](https://github.com/joshmedeski/tmux-nerd-font-window-name/blob/main/tmux-nerd-font-window-name-screenshot.jpg?raw=true)
 
 # tmux nerd font window name plugin
