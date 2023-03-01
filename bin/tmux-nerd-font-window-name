@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
+# cSpell:words lvim lfcd esac nvim lazygit
 
 NAME=$1
 
-# cSpell:words lvim lfcd esac nvim lazygit
 case $NAME in
 tmux)
 	echo ""
@@ -26,7 +26,7 @@ go)
 	echo "ﳑ"
 	;;
 lf | lfcd)
-	echo ""
+	echo ""
 	;;
 *)
 	echo "$NAME"
