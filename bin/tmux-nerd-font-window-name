@@ -4,31 +4,31 @@ NAME=$1
 
 # cSpell:words lvim lfcd esac nvim lazygit
 case $NAME in
-    tmux)
-        echo ""
-        ;;
-    fish | zsh | bash)
-        echo ""
-        ;;
-    vi | vim | nvim | lvim)
-        echo ""
-        ;;
-    lazygit | git)
-        echo ""
-        ;;
-    node)
-        echo ""
-        ;;
-    ruby)
-        echo ""
-        ;;
-    go)
-        echo "ﳑ"
-        ;;
-    lf | lfcd)
-        echo ""
-        ;;
-    *)
-        echo "$NAME"
-        ;;
+tmux)
+	echo ""
+	;;
+fish | zsh | bash)
+	echo ""
+	;;
+vi | vim | nvim | lvim)
+	echo ""
+	;;
+lazygit | git)
+	echo ""
+	;;
+node)
+	echo ""
+	;;
+ruby)
+	echo ""
+	;;
+go)
+	echo "ﳑ"
+	;;
+lf | lfcd)
+	echo ""
+	;;
+*)
+	echo "$NAME"
+	;;
 esac
