@@ -14,7 +14,7 @@ vi | vim | nvim | lvim)
 	echo ""
 	;;
 lazygit | git)
-	echo ""
+	echo ""
 	;;
 node)
 	echo ""
