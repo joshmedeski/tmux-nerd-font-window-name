@@ -29,3 +29,7 @@ When installed, your window names will automatically update to a Nerd Font that 
 ## Tasks
 
 - [x] Create tpm plugin
+
+## Contributing
+
+I encourage contributors! I want to make this plugin the best it can be. Feel free to fork it and submit pull requests with any new ideas or improvements you have.
