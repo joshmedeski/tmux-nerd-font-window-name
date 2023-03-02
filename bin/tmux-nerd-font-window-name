@@ -28,6 +28,15 @@ go)
 lf | lfcd)
 	echo ""
 	;;
+beam | beam.smp) # Erlang runtime
+	echo ""
+	;;
+rustc | rustup)
+	echo ""
+	;;
+Python)
+	echo ""
+	;;
 *)
 	echo "$NAME"
 	;;
