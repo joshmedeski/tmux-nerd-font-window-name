@@ -1,4 +1,8 @@
-![thumbnail](https://github.com/joshmedeski/tmux-nerd-font-window-name/blob/main/tmux-nerd-font-window-name-screenshot.png?raw=true)
+<a href="https://www.joshmedeski.com/posts/tmux-nerd-font-window-name-plugin/" target="_blank">
+
+![thumbnail](https://github.com/joshmedeski/tmux-nerd-font-window-name/blob/main/tmux-nerd-font-window-name-thumb.jpeg?raw=true)
+
+</a>
 
 # tmux nerd font window name plugin
 
