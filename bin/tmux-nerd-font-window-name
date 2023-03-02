@@ -7,13 +7,13 @@ case $NAME in
 tmux)
 	echo ""
 	;;
-fish | zsh | bash)
+fish | zsh | bash | tcsh)
 	echo ""
 	;;
 vi | vim | nvim | lvim)
 	echo ""
 	;;
-lazygit | git)
+lazygit | git | tig)
 	echo ""
 	;;
 node)
