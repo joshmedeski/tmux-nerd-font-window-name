@@ -16,7 +16,7 @@ Automatically rename your tmux windows to Nerd Font Icons.
 
 ## How to install
 
-### 1. Install tpm plugin
+### Install tpm plugin
 
 This script can be installed with the [Tmux Plugin Manager (tpm)](https://github.com/tmux-plugins/tpm).
 
@@ -24,6 +24,15 @@ Add the following line to your `~/.tmux.conf` file:
 
 ```conf
 set -g @plugin 'joshmedeski/tmux-nerd-font-window-name'
+```
+
+### Minimalist format
+
+If you want a minimalist format and only show the nerd font icon. You can update your window status to just `#W` (window name) in your tmux config.
+
+```conf
+set -g window-status-current-format '#[fg=magenta]#W'
+set -g window-status-format         '#[fg=gray]#W'
 ```
 
 ## How it works
