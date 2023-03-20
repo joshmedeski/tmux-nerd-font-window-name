@@ -1,0 +1,15 @@
+{
+  "flagWords": [],
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "esac",
+    "lazygit",
+    "lfcd",
+    "lvim",
+    "nvim",
+    "rustc",
+    "rustup",
+    "tcsh"
+  ]
+}

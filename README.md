@@ -26,6 +26,15 @@ Add the following line to your `~/.tmux.conf` file:
 set -g @plugin 'joshmedeski/tmux-nerd-font-window-name'
 ```
 
+### Options
+
+Add the following options to your `tmux.conf` before you set the plugin.
+
+```sh
+# shows the window name next to the icon (default false)
+set -g @tmux-nerd-font-window-name-show-name true
+```
+
 ### Minimalist format
 
 If you want a minimalist format and only show the nerd font icon. You can update your window status to just `#W` (window name) in your tmux config.
