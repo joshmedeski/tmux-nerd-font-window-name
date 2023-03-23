@@ -44,6 +44,13 @@ set -g window-status-current-format '#[fg=magenta]#W'
 set -g window-status-format         '#[fg=gray]#W'
 ```
 
+### Alternate shell icon
+
+To show a reverse white-on-black NerdFont icon for shells, set the following:
+
+```sh
+set -g @tmux-nerd-font-window-name-alterate-shell-icon true
+```
 ## How it works
 
 When installed, your window names will automatically update to a Nerd Font that matches the activity (ex: vim, bash, node, ect...).
