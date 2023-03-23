@@ -44,12 +44,12 @@ set -g window-status-current-format '#[fg=magenta]#W'
 set -g window-status-format         '#[fg=gray]#W'
 ```
 
-### Alternate shell icon
+### Custom shell icon
 
-To show a reverse white-on-black NerdFont icon for shells, set the following:
+To specify a custom shell icon, use the following option to set any icon you prefer:
 
 ```sh
-set -g @tmux-nerd-font-window-name-alterate-shell-icon true
+set -g @tmux-nerd-font-window-name-shell-icon ""
 ```
 ## How it works
 

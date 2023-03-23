@@ -2,13 +2,20 @@
 
 NAME=$1
 
-# Use reverse shell icon if option is true
-ALTERNATE_SHELL_ICON="$(tmux show -gqv '@tmux-nerd-font-window-name-alterate-shell-icon')"
-SHELL_ICON=""
+# Get shell icon, using user-provided option if available
+function get_shell_icon(){
+  local default_shell_icon=""
+  local shell_icon="$(tmux show -gqv '@tmux-nerd-font-window-name-shell-icon')"
 
-if [ "$ALTERNATE_SHELL_ICON" = true ]; then
-	SHELL_ICON=""
-fi
+  # Alternate shell icon is nonempty
+  if [ -n "$shell_icon" ]; then
+    echo "$shell_icon"
+  else
+    echo "$default_shell_icon"
+  fi
+}
+
+SHELL_ICON=$(get_shell_icon)
 
 get_icon() {
 	case $NAME in
