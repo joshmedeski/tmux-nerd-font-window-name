@@ -2,13 +2,21 @@
 
 NAME=$1
 
+# Use reverse shell icon if option is true
+ALTERNATE_SHELL_ICON="$(tmux show -gqv '@tmux-nerd-font-window-name-alterate-shell-icon')"
+SHELL_ICON=""
+
+if [ "$ALTERNATE_SHELL_ICON" = true ]; then
+	SHELL_ICON=""
+fi
+
 get_icon() {
 	case $NAME in
 	tmux)
 		echo ""
 		;;
 	fish | zsh | bash | tcsh)
-		echo ""
+		echo $SHELL_ICON
 		;;
 	vi | vim | nvim | lvim)
 		echo ""
