@@ -44,6 +44,13 @@ set -g window-status-current-format '#[fg=magenta]#W'
 set -g window-status-format         '#[fg=gray]#W'
 ```
 
+### Custom shell icon
+
+To specify a custom shell icon, use the following option to set any icon you prefer:
+
+```sh
+set -g @tmux-nerd-font-window-name-shell-icon ""
+```
 ## How it works
 
 When installed, your window names will automatically update to a Nerd Font that matches the activity (ex: vim, bash, node, ect...).

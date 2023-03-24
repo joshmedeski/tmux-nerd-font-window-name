@@ -2,13 +2,28 @@
 
 NAME=$1
 
+# Get shell icon, using user-provided option if available
+function get_shell_icon(){
+  local default_shell_icon=""
+  local shell_icon="$(tmux show -gqv '@tmux-nerd-font-window-name-shell-icon')"
+
+  # Alternate shell icon is nonempty
+  if [ -n "$shell_icon" ]; then
+    echo "$shell_icon"
+  else
+    echo "$default_shell_icon"
+  fi
+}
+
+SHELL_ICON=$(get_shell_icon)
+
 get_icon() {
 	case $NAME in
 	tmux)
 		echo ""
 		;;
 	fish | zsh | bash | tcsh)
-		echo ""
+		echo $SHELL_ICON
 		;;
 	vi | vim | nvim | lvim)
 		echo ""
