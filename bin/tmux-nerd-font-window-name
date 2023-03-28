@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
 
 NAME=$1
+SHOW_NAME="$(tmux show -gqv '@tmux-nerd-font-window-name-show-name')"
 
-# Get shell icon, using user-provided option if available
-function get_shell_icon(){
-  local default_shell_icon=""
-  local shell_icon="$(tmux show -gqv '@tmux-nerd-font-window-name-shell-icon')"
-
-  # Alternate shell icon is nonempty
-  if [ -n "$shell_icon" ]; then
-    echo "$shell_icon"
-  else
-    echo "$default_shell_icon"
-  fi
+function get_shell_icon() {
+	local default_shell_icon=""
+	local shell_icon
+	shell_icon="$(tmux show -gqv '@tmux-nerd-font-window-name-shell-icon')"
+	if [ -n "$shell_icon" ]; then
+		echo "$shell_icon"
+	else
+		echo "$default_shell_icon"
+	fi
 }
 
 SHELL_ICON=$(get_shell_icon)
@@ -23,7 +22,7 @@ get_icon() {
 		echo ""
 		;;
 	fish | zsh | bash | tcsh)
-		echo $SHELL_ICON
+		echo "$SHELL_ICON"
 		;;
 	vi | vim | nvim | lvim)
 		echo ""
@@ -53,13 +52,17 @@ get_icon() {
 		echo ""
 		;;
 	*)
-		echo "$NAME"
+		if [ "$SHOW_NAME" = true ]; then
+			echo ""
+		else
+			echo "$NAME"
+		fi
 		;;
 	esac
 }
 
 ICON=$(get_icon)
-SHOW_NAME="$(tmux show -gqv '@tmux-nerd-font-window-name-show-name')"
+
 if [ "$SHOW_NAME" = true ]; then
 	echo "$ICON" "$NAME"
 else
