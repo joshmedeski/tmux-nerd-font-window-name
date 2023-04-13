@@ -21,6 +21,9 @@ get_icon() {
 	tmux)
 		echo ""
 		;;
+	htop | top)
+		echo ""
+		;;
 	fish | zsh | bash | tcsh)
 		echo "$SHELL_ICON"
 		;;
