@@ -53,7 +53,8 @@ set -g @tmux-nerd-font-window-name-shell-icon "" # Shell
 set -g @tmux-nerd-font-window-name-music-icon "󰝚" # Music
 set -g @tmux-nerd-font-window-name-editor-icon "󰨞" # Editor
 set -g @tmux-nerd-font-window-name-editor-enable-all true # Apply to all editors (above setting only applies to editors that are not Vim or Emacs)
-set -g @tmux-nerd-font-window-name-fallback-icon "󰒓" # Unknown program
+set -g @tmux-nerd-font-window-name-git-icon "" # Git
+set -g @tmux-nerd-font-window-name-fallback-icon "󰒓" # Unknown programs
 ```
 ## How it works
 
