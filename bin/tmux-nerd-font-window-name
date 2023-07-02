@@ -14,25 +14,54 @@ function get_shell_icon() {
 	fi
 }
 
+function get_music_icon() {
+	local default_music_icon=""
+	local music_icon
+	music_icon="$(tmux show -gqv '@tmux-nerd-font-window-name-music-icon')"
+	if [ "$music_icon" != "" ]; then
+		echo "$music_icon"
+	else
+		echo "$default_music_icon"
+	fi
+}
 SHELL_ICON=$(get_shell_icon)
+MUSIC_ICON=$(get_music_icon)
 
 get_icon() {
 	case $NAME in
 	tmux)
 		echo ""
 		;;
-	htop | top)
-		echo ""
-		;;
 	fish | zsh | bash | tcsh)
 		echo "$SHELL_ICON"
 		;;
+
+	### Editors ###
 	vi | vim | nvim | lvim)
 		echo ""
+		;;
+	hx | kak)
+		echo ""
+		;;
+	emacs)
+		echo ""
 		;;
 	lazygit | git | tig)
 		echo ""
 		;;
+
+	### Utlities ###
+	lf | lfcd | ranger)
+		echo ""
+		;;
+	htop | top | btop | btm)
+		echo ""
+		;;
+	cmus | ncmpcpp)
+		echo "$MUSIC_ICON"
+		;;
+
+	### Languages ###
 	node)
 		echo ""
 		;;
@@ -42,14 +71,15 @@ get_icon() {
 	go)
 		echo ""
 		;;
-	lf | lfcd)
-		echo ""
-		;;
 	beam | beam.smp) # Erlang runtime
 		echo ""
 		;;
-	rustc | rustup)
+	rustc | rustup | cargo)
 		echo ""
+		;;
+	# TODO: Maybe find a way to make this line less long?
+	nix | nix-build | nix-collect-garbage | nix-copy-closure | nix-env | nix-info | nix-instantiate | nix-locate | nixos-build-vms | nixos-container | nixos-enter | nixos-rebuild | nix-shell)
+		echo "󱄅"
 		;;
 	Python)
 		echo ""
