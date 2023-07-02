@@ -96,6 +96,9 @@ get_icon() {
 	lf | lfcd | ranger)
 		echo ""
 		;;
+	fzf | sk)
+		echo "󱈅"
+		;;
 	lazygit | git | tig | gitui)
 		echo "$GIT_ICON"
 		;;
