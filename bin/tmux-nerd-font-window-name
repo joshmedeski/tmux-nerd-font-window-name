@@ -2,6 +2,7 @@
 
 NAME=$1
 SHOW_NAME="$(tmux show -gqv '@tmux-nerd-font-window-name-show-name')"
+ALL_EDITORS="$(tmux show -gqv '@tmux-nerd-font-window-name-editor-enable-all')"
 
 function get_shell_icon() {
 	local default_shell_icon=""
@@ -13,7 +14,6 @@ function get_shell_icon() {
 		echo "$default_shell_icon"
 	fi
 }
-
 function get_music_icon() {
 	local default_music_icon=""
 	local music_icon
@@ -24,8 +24,31 @@ function get_music_icon() {
 		echo "$default_music_icon"
 	fi
 }
+function get_editor_icon() {
+	local default_editor_icon="󱇨"
+	local editor_icon
+	editor_icon="$(tmux show -gqv '@tmux-nerd-font-window-name-editor-icon')"
+	if [ "$editor_icon" != "" ]; then
+		echo "$editor_icon"
+	else
+		echo "$default_editor_icon"
+	fi
+}
+function get_fallback_icon() {
+	local default_fallback_icon=""
+	local fallback_icon
+	fallback_icon="$(tmux show -gqv '@tmux-nerd-font-window-name-fallback-icon')"
+	if [ "$fallback_icon" != "" ]; then
+		echo "$fallback_icon"
+	else
+		echo "$default_fallback_icon"
+	fi
+}
+
 SHELL_ICON=$(get_shell_icon)
 MUSIC_ICON=$(get_music_icon)
+EDITOR_ICON=$(get_editor_icon)
+FALLBACK_ICON=$(get_fallback_icon)
 
 get_icon() {
 	case $NAME in
@@ -38,13 +61,21 @@ get_icon() {
 
 	### Editors ###
 	vi | vim | nvim | lvim)
-		echo ""
+		if [ "$ALL_EDITORS" = true ]; then
+    	echo "$EDITOR_ICON"
+    else
+			echo ""
+    fi
 		;;
 	hx | kak)
-		echo ""
+		echo "$EDITOR_ICON"
 		;;
 	emacs)
-		echo ""
+		if [ "$ALL_EDITORS" = true ]; then
+    	echo "$EDITOR_ICON"
+    else
+			echo ""
+    fi
 		;;
 	lazygit | git | tig)
 		echo ""
@@ -86,7 +117,7 @@ get_icon() {
 		;;
 	*)
 		if [ "$SHOW_NAME" = true ]; then
-			echo ""
+			echo "$FALLBACK_ICON"
 		else
 			echo "$NAME"
 		fi

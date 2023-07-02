@@ -44,12 +44,16 @@ set -g window-status-current-format '#[fg=magenta]#W'
 set -g window-status-format         '#[fg=gray]#W'
 ```
 
-### Custom shell icon
+### Customize icons
 
-To specify a custom shell icon, use the following option to set any icon you prefer:
+To specify a custom icon for your editor, music player, shell, and for unknown programs, use the following option to set any icon you prefer:
 
 ```sh
-set -g @tmux-nerd-font-window-name-shell-icon ""
+set -g @tmux-nerd-font-window-name-shell-icon "" # Shell
+set -g @tmux-nerd-font-window-name-music-icon "󰝚" # Music
+set -g @tmux-nerd-font-window-name-editor-icon "󰨞" # Editor
+set -g @tmux-nerd-font-window-name-editor-enable-all true # Apply to all editors (above setting only applies to editors that are not Vim or Emacs)
+set -g @tmux-nerd-font-window-name-fallback-icon "󰒓" # Unknown program
 ```
 ## How it works
 
