@@ -2,176 +2,33 @@
 
 NAME=$1
 SHOW_NAME="$(tmux show -gqv '@tmux-nerd-font-window-name-show-name')"
-ALL_EDITORS="$(tmux show -gqv '@tmux-nerd-font-window-name-editor-enable-all')"
 
-function get_shell_icon() {
-	local default_shell_icon=""
-	local shell_icon
-	shell_icon="$(tmux show -gqv '@tmux-nerd-font-window-name-shell-icon')"
-	if [ "$shell_icon" != "" ]; then
-		echo "$shell_icon"
-	else
-		echo "$default_shell_icon"
-	fi
-}
-function get_music_icon() {
-	local default_music_icon=""
-	local music_icon
-	music_icon="$(tmux show -gqv '@tmux-nerd-font-window-name-music-icon')"
-	if [ "$music_icon" != "" ]; then
-		echo "$music_icon"
-	else
-		echo "$default_music_icon"
-	fi
-}
-function get_editor_icon() {
-	local default_editor_icon="󱇨"
-	local editor_icon
-	editor_icon="$(tmux show -gqv '@tmux-nerd-font-window-name-editor-icon')"
-	if [ "$editor_icon" != "" ]; then
-		echo "$editor_icon"
-	else
-		echo "$default_editor_icon"
-	fi
-}
-function get_git_icon() {
-	local default_git_icon="󰊢"
-	local git_icon
-	git_icon="$(tmux show -gqv '@tmux-nerd-font-window-name-git-icon')"
-	if [ "$git_icon" != "" ]; then
-		echo "$git_icon"
-	else
-		echo "$default_git_icon"
-	fi
-}
-function get_fallback_icon() {
-	local default_fallback_icon=""
-	local fallback_icon
-	fallback_icon="$(tmux show -gqv '@tmux-nerd-font-window-name-fallback-icon')"
-	if [ "$fallback_icon" != "" ]; then
-		echo "$fallback_icon"
-	else
-		echo "$default_fallback_icon"
-	fi
+get_fallback_icon() {
+  local default_fallback_icon="󰒓"
+  local fallback_icon
+  fallback_icon="$(tmux show -gqv '@tmux-nerd-font-window-name-fallback')"
+  if [ "$fallback_icon" != "" ]; then
+    echo "$fallback_icon"
+  else
+    echo "$default_fallback_icon"
+  fi
 }
 
-SHELL_ICON=$(get_shell_icon)
-MUSIC_ICON=$(get_music_icon)
-EDITOR_ICON=$(get_editor_icon)
-GIT_ICON=$(get_git_icon)
-FALLBACK_ICON=$(get_fallback_icon)
+FALLBACK_ICON="$(get_fallback_icon)"
 
 get_icon() {
-	case $NAME in
-	tmux)
-		echo ""
-		;;
-	fish | zsh | bash | tcsh | xonsh | nu)
-		echo "$SHELL_ICON"
-		;;
-
-	### Editors ###
-	vi | vim | nvim | lvim)
-		if [ "$ALL_EDITORS" = true ]; then
-			echo "$EDITOR_ICON"
-		else
-			echo ""
-		fi
-		;;
-	emacs)
-		if [ "$ALL_EDITORS" = true ]; then
-				echo "$EDITOR_ICON"
-		else
-			echo ""
-		fi
-		;;
-	hx | kak | ne | mcedit | nano | micro)
-		echo "$EDITOR_ICON"
-		;;
-
-	### Utlities ###
-	ssh | mosh)
-		echo ""
-		;;
-	lf | lfcd | ranger)
-		echo ""
-		;;
-	fzf | sk)
-		echo "󱈅"
-		;;
-	lazygit | git | tig | gitui)
-		echo "$GIT_ICON"
-		;;
-	htop | top | btop | btm)
-		echo ""
-		;;
-	cfdisk | fdisk | parted)
-		echo ""
-		;;
-	cmus | ncmpcpp)
-		echo "$MUSIC_ICON"
-		;;
-	yt-dlp | youtube-dl)
-		echo "󰗃"
-		;;
-
-	### Package Managers ###
-	apt | nala | dpkg)
-		echo ""
-		;;
-	dnf | yum)
-		echo ""
-		;;
-	pacman | yay | paru)
-		echo ""
-		;;
-	emerge)
-		echo ""
-		;;
-	brew)
-		echo "󰂘"
-		;;
-
-	### Languages ###
-	node)
-		echo ""
-		;;
-	ruby)
-		echo ""
-		;;
-	go)
-		echo "󰟓"
-		;;
-	clang | gcc | g++)
-		echo "󰙱"
-		;;
-	beam | beam.smp) # Erlang runtime
-		echo ""
-		;;
-	rustc | rustup | cargo)
-		echo ""
-		;;
-	# TODO: Maybe find a way to make this line less long?
-	nix | nix-build | nix-collect-garbage | nix-copy-closure | nix-env | nix-info | nix-instantiate | nix-locate | nixos-build-vms | nixos-container | nixos-enter | nixos-rebuild | nix-shell)
-		echo "󱄅"
-		;;
-	Python)
-		echo ""
-		;;
-	*)
-		if [ "$SHOW_NAME" = true ]; then
-			echo "$FALLBACK_ICON"
-		else
-			echo "$NAME"
-		fi
-		;;
-	esac
+  icon="$(tmux show -gqv @tmux-nerd-font-window-name-custom-$NAME)"
+  if [ "$icon" != "" ] ; then
+    echo $icon
+  else
+    echo $FALLBACK_ICON
+  fi
 }
 
 ICON=$(get_icon)
 
 if [ "$SHOW_NAME" = true ]; then
-	echo "$ICON" "$NAME"
+  echo "$ICON" "$NAME"
 else
-	echo "$ICON"
+  echo "$ICON"
 fi
