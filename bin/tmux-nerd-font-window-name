@@ -73,17 +73,17 @@ get_icon() {
 	### Editors ###
 	vi | vim | nvim | lvim)
 		if [ "$ALL_EDITORS" = true ]; then
-    	echo "$EDITOR_ICON"
-    else
+			echo "$EDITOR_ICON"
+		else
 			echo ""
-    fi
+		fi
 		;;
 	emacs)
 		if [ "$ALL_EDITORS" = true ]; then
-    	echo "$EDITOR_ICON"
-    else
+				echo "$EDITOR_ICON"
+		else
 			echo ""
-    fi
+		fi
 		;;
 	hx | kak | ne | mcedit | nano | micro)
 		echo "$EDITOR_ICON"
