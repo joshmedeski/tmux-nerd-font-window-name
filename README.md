@@ -1,8 +1,8 @@
-## Tmux Window Icons
+# tmux nerd font window name plugin
 
-![screenshot](./screenshot.png)
+Automatically add Nerd Font support to your tmux window names!
 
-Automatically rename your tmux windows to your specificed icons.
+![tmux-nerd-font-window-name screenshot](./tmux-nerd-font-window-name-screenshot.png)
 
 ## Requirements
 
@@ -16,7 +16,7 @@ Automatically rename your tmux windows to your specificed icons.
 
 This plugin can be installed with the [Tmux Plugin Manager (tpm)](https://github.com/tmux-plugins/tpm).
 
-Add the following line to your configuration file:
+Add the following line to your tmux configuration file:
 
 ```sh
 set -g @plugin 'joshmedeski/tmux-nerd-font-window-name'
@@ -24,40 +24,17 @@ set -g @plugin 'joshmedeski/tmux-nerd-font-window-name'
 
 ## Configuration
 
-### Show window name
+You can configure this plugin by creating a `~/.config/tmux/tmux-nerd-font-window-name.yml` file. The following options can be changed:
 
-Put the following line below to show the window name beside the icon. (This is not enabled by default)
+```yml
+config:
+  fallback-icon: "?" # icon to use if no definition is found
+  show-name: true # show the window name with the icon
 
-```sh
-set -g @tmux-nerd-font-window-name-show-name true
+icons:
+  zsh: "" # overwrite with your own symbol (Nerd Font icon, emoji, whatever!)
+  cmatrix: "🤯" # add new entries that aren't included
 ```
-
-### Customize icons
-
-The syntax of the setting of an icon is,
-
-```sh
-set -g @tmux-nerd-font-window-name-custom-<program> "<icon>"
-```
-
-`<program>` is the name of the program, and `<icon>` is the icon/text the program name is assigned to.
-
-For example, lets use `lazygit`,
-
-```sh
-set -g @tmux-nerd-font-window-name-custom-lazygit "LZYGIT"
-```
-
-This makes the icon for every `lazygit` window `LZYGIT`
-
-You can also set the fallback icon for programs that haven't been assigned to a icon,
-```sh
-set -g @tmux-nerd-font-window-name-fallback-icon "???"
-```
-
-### Recommended icon settings
-
-To remove the duplication of effort, open the file `recommended-icons.conf` to get preset settings and copy the lines you need to your tmux configuration file.
 
 ## Contributions
 
