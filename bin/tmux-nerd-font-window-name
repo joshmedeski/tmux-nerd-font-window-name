@@ -1,24 +1,20 @@
 #!/usr/bin/env bash
 
-NAME=$1
-SHOW_NAME="$(tmux show -gqv '@tmux-nerd-font-window-name-show-name')"
+NAME="$1"
+# ACTUAL CONFIG DIRECTORY
+# CONFIG_FILE='$HOME/.config/tmux-icons.yml'
 
-get_fallback_icon() {
-  local default_fallback_icon="󰒓"
-  local fallback_icon
-  fallback_icon="$(tmux show -gqv '@tmux-nerd-font-window-name-fallback')"
-  if [ "$fallback_icon" != "" ]; then
-    echo "$fallback_icon"
-  else
-    echo "$default_fallback_icon"
-  fi
-}
+# TEST DIRECTORY - DO NOT USE IN PROD
+CONFIG_FILE='./tmux-icons.yml'
 
-FALLBACK_ICON="$(get_fallback_icon)"
+SHOW_NAME="$(yq '.config.show-icons' $CONFIG_FILE)"
+
+FALLBACK_ICON="$(yq '.config.fallback-icon' $CONFIG_FILE)"
 
 get_icon() {
-  icon="$(tmux show -gqv @tmux-nerd-font-window-name-custom-$NAME)"
-  if [ "$icon" != "" ] ; then
+  value_name=".icons.$NAME"
+  icon="$(yq $value_name $CONFIG_FILE)"
+  if [ "$icon" != "null" ] ; then
     echo $icon
   else
     echo $FALLBACK_ICON
