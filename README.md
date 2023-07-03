@@ -1,5 +1,7 @@
 ## Tmux Window Icons
 
+![screenshot](./screenshot.png)
+
 Automatically rename your tmux windows to your specificed icons.
 
 ## Requirements
@@ -37,7 +39,7 @@ The syntax of the setting of an icon is,
 set -g @tmux-nerd-font-window-name-custom-<program> "<icon>"
 ```
 
-`<program` is the name of the program, and `<icon>` is the icon/text the program name is assigned to.
+`<program>` is the name of the program, and `<icon>` is the icon/text the program name is assigned to.
 
 For example, lets use `lazygit`,
 
