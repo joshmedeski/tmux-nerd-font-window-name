@@ -1,16 +1,28 @@
 #!/usr/bin/env bash
 
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NAME="$1"
-CONFIG_FILE="$CURRENT_DIR/defaults.yml"
-SHOW_NAME="$(yq '.config.show-name' "$CONFIG_FILE")"
-FALLBACK_ICON="$(yq '.config.fallback-icon' "$CONFIG_FILE")"
-ICON="$(yq ".icons.$NAME" "$CONFIG_FILE")"
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DEFAULT_CONFIG="$CURRENT_DIR/defaults.yml"
+USER_CONFIG="$HOME/.config/tmux/tmux-nerd-font-window-name.yml"
+
+get_config_value() {
+	local key=$1
+	local value
+	value="$(yq "$key" "$USER_CONFIG")"
+	if [ "$value" == "null" ]; then # get default config value
+		value="$(yq "$key" "$DEFAULT_CONFIG")"
+	fi
+	echo "$value"
+}
+
+ICON="$(get_config_value ".icons.$NAME")"
 
 if [ "$ICON" == "null" ]; then
-	echo "$FALLBACK_ICON"
+	FALLBACK_ICON="$(get_config_value '.config.fallback-icon')"
+	ICON="$FALLBACK_ICON"
 fi
 
+SHOW_NAME="$(get_config_value '.config.show-name')"
 if [ "$SHOW_NAME" = true ]; then
 	ICON="$ICON $NAME"
 fi
