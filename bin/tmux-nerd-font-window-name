@@ -1,30 +1,18 @@
 #!/usr/bin/env bash
 
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NAME="$1"
-# ACTUAL CONFIG DIRECTORY
-# CONFIG_FILE='$HOME/.config/tmux-icons.yml'
+CONFIG_FILE="$CURRENT_DIR/defaults.yml"
+SHOW_NAME="$(yq '.config.show-name' "$CONFIG_FILE")"
+FALLBACK_ICON="$(yq '.config.fallback-icon' "$CONFIG_FILE")"
+ICON="$(yq ".icons.$NAME" "$CONFIG_FILE")"
 
-# TEST DIRECTORY - DO NOT USE IN PROD
-CONFIG_FILE='./tmux-icons.yml'
-
-SHOW_NAME="$(yq '.config.show-icons' $CONFIG_FILE)"
-
-FALLBACK_ICON="$(yq '.config.fallback-icon' $CONFIG_FILE)"
-
-get_icon() {
-  value_name=".icons.$NAME"
-  icon="$(yq $value_name $CONFIG_FILE)"
-  if [ "$icon" != "null" ] ; then
-    echo $icon
-  else
-    echo $FALLBACK_ICON
-  fi
-}
-
-ICON=$(get_icon)
+if [ "$ICON" == "null" ]; then
+	echo "$FALLBACK_ICON"
+fi
 
 if [ "$SHOW_NAME" = true ]; then
-  echo "$ICON" "$NAME"
-else
-  echo "$ICON"
+	ICON="$ICON $NAME"
 fi
+
+echo "$ICON"
