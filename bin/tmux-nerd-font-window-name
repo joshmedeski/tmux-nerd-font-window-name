@@ -1,73 +1,30 @@
 #!/usr/bin/env bash
 
-NAME=$1
-SHOW_NAME="$(tmux show -gqv '@tmux-nerd-font-window-name-show-name')"
+NAME="$1"
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DEFAULT_CONFIG="$CURRENT_DIR/defaults.yml"
+USER_CONFIG="$HOME/.config/tmux/tmux-nerd-font-window-name.yml"
 
-function get_shell_icon() {
-	local default_shell_icon=""
-	local shell_icon
-	shell_icon="$(tmux show -gqv '@tmux-nerd-font-window-name-shell-icon')"
-	if [ "$shell_icon" != "" ]; then
-		echo "$shell_icon"
-	else
-		echo "$default_shell_icon"
+get_config_value() {
+	local key=$1
+	local value
+	value="$(yq "$key" "$USER_CONFIG")"
+	if [ "$value" == "null" ]; then # get default config value
+		value="$(yq "$key" "$DEFAULT_CONFIG")"
 	fi
+	echo "$value"
 }
 
-SHELL_ICON=$(get_shell_icon)
+ICON="$(get_config_value ".icons.$NAME")"
 
-get_icon() {
-	case $NAME in
-	tmux)
-		echo ""
-		;;
-	htop | top)
-		echo ""
-		;;
-	fish | zsh | bash | tcsh)
-		echo "$SHELL_ICON"
-		;;
-	vi | vim | nvim | lvim)
-		echo ""
-		;;
-	lazygit | git | tig)
-		echo ""
-		;;
-	node)
-		echo ""
-		;;
-	ruby)
-		echo ""
-		;;
-	go)
-		echo ""
-		;;
-	lf | lfcd)
-		echo ""
-		;;
-	beam | beam.smp) # Erlang runtime
-		echo ""
-		;;
-	rustc | rustup)
-		echo ""
-		;;
-	Python)
-		echo ""
-		;;
-	*)
-		if [ "$SHOW_NAME" = true ]; then
-			echo ""
-		else
-			echo "$NAME"
-		fi
-		;;
-	esac
-}
-
-ICON=$(get_icon)
-
-if [ "$SHOW_NAME" = true ]; then
-	echo "$ICON" "$NAME"
-else
-	echo "$ICON"
+if [ "$ICON" == "null" ]; then
+	FALLBACK_ICON="$(get_config_value '.config.fallback-icon')"
+	ICON="$FALLBACK_ICON"
 fi
+
+SHOW_NAME="$(get_config_value '.config.show-name')"
+if [ "$SHOW_NAME" = true ]; then
+	ICON="$ICON $NAME"
+fi
+
+echo "$ICON"

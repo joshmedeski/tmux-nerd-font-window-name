@@ -1,64 +1,41 @@
-<a href="https://www.joshmedeski.com/posts/tmux-nerd-font-window-name-plugin/" target="_blank">
-
-![thumbnail](https://github.com/joshmedeski/tmux-nerd-font-window-name/blob/main/tmux-nerd-font-window-name-thumb.jpeg?raw=true)
-
-</a>
-
 # tmux nerd font window name plugin
 
-Automatically rename your tmux windows to Nerd Font Icons.
+Automatically add Nerd Font support to your tmux window names!
 
-## Prerequisites
+![tmux-nerd-font-window-name screenshot](./tmux-nerd-font-window-name-screenshot.png)
+
+## Requirements
 
 - [tmux](https://github.com/tmux/tmux)
 - [tpm](https://github.com/tmux-plugins/tpm)
-- [Nerd Font](https://www.nerdfonts.com/)
+- [yq](https://github.com/mikefarah/yq)
 
-## How to install
+## Installation
 
 ### Install tpm plugin
 
-This script can be installed with the [Tmux Plugin Manager (tpm)](https://github.com/tmux-plugins/tpm).
+This plugin can be installed with the [Tmux Plugin Manager (tpm)](https://github.com/tmux-plugins/tpm).
 
-Add the following line to your `~/.tmux.conf` file:
+Add the following line to your tmux configuration file:
 
-```conf
+```sh
 set -g @plugin 'joshmedeski/tmux-nerd-font-window-name'
 ```
 
-### Options
+## Configuration
 
-Add the following options to your `tmux.conf` before you set the plugin.
+You can configure this plugin by creating a `~/.config/tmux/tmux-nerd-font-window-name.yml` file. The following options can be changed:
 
-```sh
-# shows the window name next to the icon (default false)
-set -g @tmux-nerd-font-window-name-show-name true
+```yml
+config:
+  fallback-icon: "?" # icon to use if no definition is found
+  show-name: true # show the window name with the icon
+
+icons:
+  zsh: "" # overwrite with your own symbol (Nerd Font icon, emoji, whatever!)
+  cmatrix: "🤯" # add new entries that aren't included
 ```
 
-### Minimalist format
+## Contributions
 
-If you want a minimalist format and only show the nerd font icon. You can update your window status to just `#W` (window name) in your tmux config.
-
-```conf
-set -g window-status-current-format '#[fg=magenta]#W'
-set -g window-status-format         '#[fg=gray]#W'
-```
-
-### Custom shell icon
-
-To specify a custom shell icon, use the following option to set any icon you prefer:
-
-```sh
-set -g @tmux-nerd-font-window-name-shell-icon ""
-```
-## How it works
-
-When installed, your window names will automatically update to a Nerd Font that matches the activity (ex: vim, bash, node, ect...).
-
-## Tasks
-
-- [x] Create tpm plugin
-
-## Contributing
-
-I encourage contributors! I want to make this plugin the best it can be. Feel free to fork it and submit pull requests with any new ideas or improvements you have.
+Contributions are welcome! Feel free to make a pull request to submit more preset icon settings or improve the codebase!
