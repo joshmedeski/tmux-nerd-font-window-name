@@ -6,6 +6,7 @@ config:
 icons:
   apt: ""
   bash: ""
+  caffeinate: ""
   beam.smp: ""
   beam: ""
   brew: ""
