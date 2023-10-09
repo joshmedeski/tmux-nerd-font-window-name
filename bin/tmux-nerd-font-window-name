@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 NAME="$1"
+PANES="$2"
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEFAULT_CONFIG="$CURRENT_DIR/defaults.yml"
 USER_CONFIG="$HOME/.config/tmux/tmux-nerd-font-window-name.yml"
@@ -24,6 +25,13 @@ ICON="$(get_config_value ".icons.$NAME")"
 if [ "$ICON" == "null" ]; then
 	FALLBACK_ICON="$(get_config_value '.config.fallback-icon')"
 	ICON="$FALLBACK_ICON"
+fi
+
+if [ "$PANES" -gt 1 ]; then
+	MULTI_PANE_ICON="$(get_config_value '.config.multi-pane-icon')"
+	if [ "$MULTI_PANE_ICON" != "null" ]; then
+		ICON="$MULTI_PANE_ICON $ICON"
+	fi
 fi
 
 SHOW_NAME="$(get_config_value '.config.show-name')"

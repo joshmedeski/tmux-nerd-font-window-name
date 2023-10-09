@@ -29,6 +29,7 @@ You can configure this plugin by creating a `~/.config/tmux/tmux-nerd-font-windo
 ```yml
 config:
   fallback-icon: "?" # icon to use if no definition is found
+  multi-pane-icon: "" # icon to use for window with multiple panes, if not specified, only active pane's icon will used as the default.
   show-name: true # show the window name with the icon
 
 icons:
