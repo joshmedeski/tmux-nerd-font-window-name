@@ -20,20 +20,18 @@ get_config_value() {
 	echo "$value"
 }
 
-if [ "$PANES" -gt 1 ]; then
-	MULTI_PANES_ICON="$(get_config_value '.config.multi-panes-icon')"
-	if [ "$MULTI_PANES_ICON" != "null" ]; then
-		ICON="$MULTI_PANES_ICON"
-	fi
-fi
-
-if [ -z "$ICON" ]; then
-	ICON="$(get_config_value ".icons.$NAME")"
-fi
+ICON="$(get_config_value ".icons.$NAME")"
 
 if [ "$ICON" == "null" ]; then
 	FALLBACK_ICON="$(get_config_value '.config.fallback-icon')"
 	ICON="$FALLBACK_ICON"
+fi
+
+if [ "$PANES" -gt 1 ]; then
+	MULTI_PANE_ICON="$(get_config_value '.config.multi-pane-icon')"
+	if [ "$MULTI_PANE_ICON" != "null" ]; then
+		ICON="$MULTI_PANE_ICON $ICON"
+	fi
 fi
 
 SHOW_NAME="$(get_config_value '.config.show-name')"
