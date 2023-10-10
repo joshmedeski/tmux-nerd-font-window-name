@@ -20,8 +20,14 @@ get_config_value() {
 	echo "$value"
 }
 
-LOWERCASE_NAME=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
-ICON="$(get_config_value ".icons.$LOWERCASE_NAME")"
+ICON_NAME="$NAME"
+
+DOWNCASE_NAME="$(get_config_value '.config.downcase-name')"
+if [ "$DOWNCASE_NAME" = true ]; then
+	ICON_NAME=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
+fi
+
+ICON="$(get_config_value ".icons.$ICON_NAME")"
 
 if [ "$ICON" == "null" ]; then
 	FALLBACK_ICON="$(get_config_value '.config.fallback-icon')"

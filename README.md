@@ -31,6 +31,7 @@ config:
   fallback-icon: "?" # icon to use if no definition is found
   multi-pane-icon: "" # icon to use for window with multiple panes, if not specified, only active pane's icon will used as the default.
   show-name: true # show the window name with the icon
+  downcase-name: false # downcase the window name before icon lookup
 
 icons:
   zsh: "" # overwrite with your own symbol (Nerd Font icon, emoji, whatever!)
