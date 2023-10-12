@@ -16,8 +16,8 @@ startup_message() {
 		fi;
 	done
 	if [[ $MISSING_PLUGINS_LIST != "" ]]; then
-		tmux set-hook -g session-created 'display-popup echo "[33mError:[0m\n\
-The following dependencies are required for tmux-nerd-font-window-name to work properly:\n\
+		tmux set-hook -g session-created 'display-popup echo "[33mWarning:[0m\n\
+tmux-nerd-font-window-name depends on the following packages:\n\
 '"${MISSING_PLUGINS_LIST}"'\n\
 Please ensure all dependencies are installed correctly.\n\
 [2;3m(Press [0;33;1mESC[0;2;3m key to dismiss)[0m"'
