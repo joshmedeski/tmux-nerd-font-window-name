@@ -20,7 +20,7 @@ get_config_value() {
 	echo "$value"
 }
 
-ICON="$(get_config_value ".icons.$NAME")"
+ICON="$(get_config_value ".icons.\"$NAME\"")"
 
 if [ "$ICON" == "null" ]; then
 	FALLBACK_ICON="$(get_config_value '.config.fallback-icon')"
