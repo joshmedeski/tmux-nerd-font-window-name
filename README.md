@@ -8,7 +8,7 @@ Automatically add Nerd Font support to your tmux window names!
 
 - [tmux](https://github.com/tmux/tmux)
 - [tpm](https://github.com/tmux-plugins/tpm)
-- [yq](https://github.com/mikefarah/yq)
+- [yq](https://github.com/mikefarah/yq) (>=4)
 
 ## Installation
 
