@@ -20,7 +20,8 @@ Add the following line to your tmux configuration file:
 set -g @plugin 'joshmedeski/tmux-nerd-font-window-name'
 ```
 
-Run `<prefix>+I` to trigger the tpm installer which will download and source the plugin.
+Run `<prefix>+I` to trigger the tpm installer which will download
+and source the plugin.
 
 ## Configuration
 
