@@ -43,6 +43,12 @@ icons:
 Contributions are welcome! Feel free to make a pull request to submit more
 preset icon settings or improve the codebase!
 
+## Intro Video
+
+Here is the introduction blog post and video that I made for this plugin:
+
+[![blog post](./tmux-nerd-font-window-name-thumb.jpeg)](https://www.joshmedeski.com/posts/tmux-nerd-font-window-name-plugin/)
+
 ## Additional tmux plugins
 
 I've authored a few other tmux plugins that you might find useful:
