@@ -6,15 +6,13 @@ Automatically add Nerd Font support to your tmux window names!
 
 ## Requirements
 
+The following depdencies are required in order to use this plugin:
+
 - [tmux](https://github.com/tmux/tmux)
 - [tpm](https://github.com/tmux-plugins/tpm)
 - [yq](https://github.com/mikefarah/yq) (>=4)
 
-## Installation
-
-### Install tpm plugin
-
-This plugin can be installed with the [Tmux Plugin Manager (tpm)](https://github.com/tmux-plugins/tpm).
+## Installation (via tpm)
 
 Add the following line to your tmux configuration file:
 
@@ -22,15 +20,18 @@ Add the following line to your tmux configuration file:
 set -g @plugin 'joshmedeski/tmux-nerd-font-window-name'
 ```
 
+Run `<prefix>+I` to trigger the tpm installer which will download and source the plugin.
+
 ## Configuration
 
-You can configure this plugin by creating a `~/.config/tmux/tmux-nerd-font-window-name.yml` file. The following options can be changed:
+You can configure this plugin by creating a `~/.config/tmux/tmux-nerd-font-window-name.yml`
+file. The following options can be changed:
 
 ```yml
 config:
-  fallback-icon: "?" # icon to use if no definition is found
-  multi-pane-icon: "" # icon to use for window with multiple panes, if not specified, only active pane's icon will used as the default.
-  show-name: true # show the window name with the icon
+  fallback-icon: "?" # show when no definition is found
+  multi-pane-icon: "" # show when window has multiple panes (blank by default)
+  show-name: true # show the window name with the icon (defaults to false)
 
 icons:
   zsh: "" # overwrite with your own symbol (Nerd Font icon, emoji, whatever!)
@@ -39,4 +40,12 @@ icons:
 
 ## Contributions
 
-Contributions are welcome! Feel free to make a pull request to submit more preset icon settings or improve the codebase!
+Contributions are welcome! Feel free to make a pull request to submit more
+preset icon settings or improve the codebase!
+
+## Additional tmux plugins
+
+I've authored a few other tmux plugins that you might find useful:
+
+- [t - the smart tmux session manager](https://github.com/joshmedeski/t-smart-tmux-session-manager)
+- [tmux-fzf-url - Quickly open urls on your terminal screen!](https://github.com/joshmedeski/tmux-fzf-url)
