@@ -6,7 +6,7 @@ Automatically add Nerd Font support to your tmux window names!
 
 ## Requirements
 
-The following depdencies are required in order to use this plugin:
+The following dependencies are required in order to use this plugin:
 
 - [tmux](https://github.com/tmux/tmux)
 - [tpm](https://github.com/tmux-plugins/tpm)
