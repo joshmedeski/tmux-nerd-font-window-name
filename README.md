@@ -33,6 +33,7 @@ config:
   fallback-icon: "?" # show when no definition is found
   multi-pane-icon: "" # show when window has multiple panes (blank by default)
   show-name: true # show the window name with the icon (defaults to false)
+  icon-position: "left" # show the icon to the "left" or "right" of the window name (defaults to left)
 
 icons:
   zsh: "" # overwrite with your own symbol (Nerd Font icon, emoji, whatever!)
