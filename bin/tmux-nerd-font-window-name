@@ -36,7 +36,12 @@ fi
 
 SHOW_NAME="$(get_config_value '.config.show-name')"
 if [ "$SHOW_NAME" = true ]; then
-	ICON="$ICON $NAME"
+	ICON_POSITION="$(get_config_value '.config.icon-position')"
+	if [ "$ICON_POSITION" == "right" ]; then
+		ICON="$NAME $ICON"
+	else
+		ICON="$ICON $NAME"
+	fi
 fi
 
 echo "$ICON"
