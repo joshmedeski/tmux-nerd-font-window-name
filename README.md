@@ -55,5 +55,5 @@ Here is the introduction blog post and video that I made for this plugin:
 
 I've authored a few other tmux plugins that you might find useful:
 
-- [t - the smart tmux session manager](https://github.com/joshmedeski/t-smart-tmux-session-manager)
-- [tmux-fzf-url - Quickly open urls on your terminal screen!](https://github.com/joshmedeski/tmux-fzf-url)
+- [sesh - tmux session manager](https://github.com/joshmedeski/sesh)
+- [tmux-fzf-url - Quickly open urls with fzf](https://github.com/joshmedeski/tmux-fzf-url)
