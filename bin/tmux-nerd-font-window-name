@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if ! command -v yq >/dev/null 2>&1; then
+	echo "$1 ⚠︎ yq missing"
+	exit 1
+fi
+
 NAME="$1"
 PANES="$2"
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
