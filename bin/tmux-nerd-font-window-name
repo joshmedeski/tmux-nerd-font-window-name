@@ -5,6 +5,12 @@ if ! command -v yq >/dev/null 2>&1; then
 	exit 1
 fi
 
+EVAL=""
+version="$(yq --version | sed 's/.*[[:digit:]].\([[:digit:]]\).[[:digit:]]/\1/')"
+if (($version < 18)); then
+  EVAL="eval"
+fi
+
 NAME="$1"
 PANES="$2"
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -15,12 +21,12 @@ get_config_value() {
 	local key=$1
 	local value
 	if test -f "$USER_CONFIG"; then
-		value="$(yq "$key" "$USER_CONFIG")"
+		value="$(yq $EVAL "$key" "$USER_CONFIG")"
 		if [ "$value" == "null" ]; then # get default config value
-			value="$(yq "$key" "$DEFAULT_CONFIG")"
+			value="$(yq $EVAL "$key" "$DEFAULT_CONFIG")"
 		fi
 	else
-		value="$(yq "$key" "$DEFAULT_CONFIG")"
+		value="$(yq $EVAL "$key" "$DEFAULT_CONFIG")"
 	fi
 	echo "$value"
 }
