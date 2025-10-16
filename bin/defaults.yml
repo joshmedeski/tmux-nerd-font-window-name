@@ -6,6 +6,7 @@ config:
 icons:
   apt: ""
   bash: ""
+  bazel: ""
   caffeinate: ""
   cargo: ""
   beam.smp: ""
