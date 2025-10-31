@@ -6,7 +6,7 @@ plugin_format="#($CURRENT_DIR/bin/tmux-nerd-font-window-name #{pane_current_comm
 user_format="$(tmux show-option -gv automatic-rename-format 2>/dev/null)"
 placeholder="#{window_icon}"
 
-if [[ "$user_format" == *"$placeholder"* ]]; then
+if [[ -n "$user_format" && "$user_format" == *"$placeholder"* ]]; then
     new_format="${user_format//$placeholder/$plugin_format}"
 else
     new_format="$plugin_format"
