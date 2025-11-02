@@ -48,7 +48,7 @@ you can include a placeholder that lets this plugin inject its icon output.
 For example:
 
 ```tmux
-set -g automatic-rename-format "#{window_icon} #{pane_current_command}"
+set -g automatic-rename-format "#{window_icon} #{b:pane_current_path}"
 ```
 
 ## Contributions
