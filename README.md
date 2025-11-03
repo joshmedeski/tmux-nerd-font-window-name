@@ -40,6 +40,17 @@ icons:
   cmatrix: "🤯" # add new entries that aren't included
 ```
 
+### Custom Placeholder Support
+
+If you prefer to define your own `automatic-rename-format`,
+you can include a placeholder that lets this plugin inject its icon output.
+
+For example:
+
+```tmux
+set -g automatic-rename-format "#{window_icon} #{b:pane_current_path}"
+```
+
 ## Contributions
 
 Contributions are welcome! Feel free to make a pull request to submit more
