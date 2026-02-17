@@ -1,0 +1,5 @@
+config:
+  fallback-icon: "?"
+  show-name: false
+  always-show-fallback-name: true
+  icon-position: right
