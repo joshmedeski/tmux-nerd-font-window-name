@@ -51,10 +51,9 @@ For example:
 set -g automatic-rename-format "#{window_icon} #{b:pane_current_path}"
 ```
 
-## Contributions
+## Contributing
 
-Contributions are welcome! Feel free to make a pull request to submit more
-preset icon settings or improve the codebase!
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on adding icons, running tests, and submitting pull requests.
 
 ## Intro Video
 
