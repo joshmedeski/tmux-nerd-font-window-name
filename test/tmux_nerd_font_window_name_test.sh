@@ -5,6 +5,9 @@ SCRIPT="$SCRIPT_DIR/tmux-nerd-font-window-name"
 FIXTURES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/fixtures" && pwd)"
 DEFAULTS="$SCRIPT_DIR/defaults.yml"
 
+# Source the script to make main() available for coverage tracking
+source "$SCRIPT"
+
 # Helper: get expected icon from defaults.yml
 get_default_icon() {
   yq -r ".icons[\"$1\"]" "$DEFAULTS"
@@ -23,7 +26,7 @@ tear_down() {
 
 function test_known_command_returns_its_icon() {
   export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/no-show-name.yml"
-  output="$("$SCRIPT" nvim 1 2>&1)" && exit_code=$? || exit_code=$?
+  output="$(main nvim 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
   expected="$(get_default_icon nvim)"
   assert_equals "$expected" "$output"
@@ -31,7 +34,7 @@ function test_known_command_returns_its_icon() {
 
 function test_unknown_command_returns_fallback_icon() {
   export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/no-show-name.yml"
-  output="$("$SCRIPT" some-unknown-program 1 2>&1)" && exit_code=$? || exit_code=$?
+  output="$(main some-unknown-program 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
   assert_equals "?" "$output"
 }
@@ -40,7 +43,7 @@ function test_unknown_command_returns_fallback_icon() {
 
 function test_show_name_left_icon_before_name() {
   export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/show-name-left.yml"
-  output="$("$SCRIPT" nvim 1 2>&1)" && exit_code=$? || exit_code=$?
+  output="$(main nvim 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
   expected="$(get_default_icon nvim) nvim"
   assert_equals "$expected" "$output"
@@ -48,7 +51,7 @@ function test_show_name_left_icon_before_name() {
 
 function test_show_name_right_name_before_icon() {
   export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/show-name-right.yml"
-  output="$("$SCRIPT" nvim 1 2>&1)" && exit_code=$? || exit_code=$?
+  output="$(main nvim 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
   expected="nvim $(get_default_icon nvim)"
   assert_equals "$expected" "$output"
@@ -56,7 +59,7 @@ function test_show_name_right_name_before_icon() {
 
 function test_show_name_with_unknown_command_shows_fallback_icon_and_name() {
   export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/show-name-left.yml"
-  output="$("$SCRIPT" some-unknown-program 1 2>&1)" && exit_code=$? || exit_code=$?
+  output="$(main some-unknown-program 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
   assert_equals "? some-unknown-program" "$output"
 }
@@ -65,14 +68,14 @@ function test_show_name_with_unknown_command_shows_fallback_icon_and_name() {
 
 function test_always_show_fallback_name_unknown_command_shows_name_left() {
   export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/fallback-name.yml"
-  output="$("$SCRIPT" some-unknown-program 1 2>&1)" && exit_code=$? || exit_code=$?
+  output="$(main some-unknown-program 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
   assert_equals "? some-unknown-program" "$output"
 }
 
 function test_always_show_fallback_name_known_command_stays_icon_only() {
   export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/fallback-name.yml"
-  output="$("$SCRIPT" nvim 1 2>&1)" && exit_code=$? || exit_code=$?
+  output="$(main nvim 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
   expected="$(get_default_icon nvim)"
   assert_equals "$expected" "$output"
@@ -80,7 +83,7 @@ function test_always_show_fallback_name_known_command_stays_icon_only() {
 
 function test_always_show_fallback_name_respects_icon_position_right() {
   export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/fallback-name-right.yml"
-  output="$("$SCRIPT" some-unknown-program 1 2>&1)" && exit_code=$? || exit_code=$?
+  output="$(main some-unknown-program 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
   assert_equals "some-unknown-program ?" "$output"
 }
@@ -89,7 +92,7 @@ function test_always_show_fallback_name_respects_icon_position_right() {
 
 function test_multi_pane_prepends_icon_when_panes_greater_than_1() {
   export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/multi-pane.yml"
-  output="$("$SCRIPT" nvim 2 2>&1)" && exit_code=$? || exit_code=$?
+  output="$(main nvim 2 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
   expected="M $(get_default_icon nvim)"
   assert_equals "$expected" "$output"
@@ -97,7 +100,7 @@ function test_multi_pane_prepends_icon_when_panes_greater_than_1() {
 
 function test_multi_pane_no_prefix_for_single_pane() {
   export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/multi-pane.yml"
-  output="$("$SCRIPT" nvim 1 2>&1)" && exit_code=$? || exit_code=$?
+  output="$(main nvim 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
   expected="$(get_default_icon nvim)"
   assert_equals "$expected" "$output"
@@ -107,14 +110,14 @@ function test_multi_pane_no_prefix_for_single_pane() {
 
 function test_user_config_overrides_default_icon() {
   export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/override.yml"
-  output="$("$SCRIPT" nvim 1 2>&1)" && exit_code=$? || exit_code=$?
+  output="$(main nvim 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
   assert_equals "CUSTOM" "$output"
 }
 
 function test_user_config_overrides_fallback_icon() {
   export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/override.yml"
-  output="$("$SCRIPT" some-unknown-program 1 2>&1)" && exit_code=$? || exit_code=$?
+  output="$(main some-unknown-program 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
   assert_equals "X" "$output"
 }
@@ -124,7 +127,7 @@ function test_user_config_overrides_fallback_icon() {
 function test_missing_yq_exits_1_with_error_message() {
   export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/no-show-name.yml"
   export PATH="/usr/bin:/bin"
-  output="$("$SCRIPT" nvim 1 2>&1)" && exit_code=$? || exit_code=$?
+  output="$(main nvim 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_general_error
   assert_contains "yq missing" "$output"
 }
@@ -133,16 +136,15 @@ function test_missing_yq_exits_1_with_error_message() {
 
 function test_no_user_config_file_falls_back_to_defaults() {
   export TMUX_NERD_FONT_USER_CONFIG="/nonexistent/path/config.yml"
-  output="$("$SCRIPT" nvim 1 2>&1)" && exit_code=$? || exit_code=$?
+  output="$(main nvim 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
-  # defaults.yml has show-name: true, so output should include the name
   expected="$(get_default_icon nvim) nvim"
   assert_equals "$expected" "$output"
 }
 
 function test_fallback_name_disabled_unknown_command_shows_only_fallback_icon() {
   export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/no-show-name.yml"
-  output="$("$SCRIPT" some-unknown-program 1 2>&1)" && exit_code=$? || exit_code=$?
+  output="$(main some-unknown-program 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
   assert_equals "?" "$output"
 }
