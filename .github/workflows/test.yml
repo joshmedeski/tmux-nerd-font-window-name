@@ -20,7 +20,8 @@ jobs:
         run: ./lib/bashunit test/ --log-junit results.xml
       - name: Test report
         uses: dorny/test-reporter@v1
-        if: always()
+        # Skip for fork PRs which lack write permissions
+        if: always() && github.event.pull_request.head.repo.full_name == github.repository
         with:
           name: bashunit
           path: results.xml
