@@ -33,8 +33,10 @@ get_config_value() {
 ICON="$(get_config_value ".icons[\"$NAME\"]")"
 
 # Fallback icon if no specific icon is found
+IS_FALLBACK=false
 if [ "$ICON" == "null" ] || [ -z "$ICON" ]; then
   ICON="$(get_config_value '.config["fallback-icon"]')"
+  IS_FALLBACK=true
 fi
 
 # If multiple panes are open, add a multi-pane icon if available
@@ -53,6 +55,16 @@ if [ "$SHOW_NAME" = "true" ]; then
     ICON="$NAME $ICON"
   else
     ICON="$ICON $NAME"
+  fi
+elif [ "$IS_FALLBACK" = "true" ]; then
+  ALWAYS_SHOW_FALLBACK_NAME="$(get_config_value '.config["always-show-fallback-name"]')"
+  if [ "$ALWAYS_SHOW_FALLBACK_NAME" = "true" ]; then
+    ICON_POSITION="$(get_config_value '.config["icon-position"]')"
+    if [ "$ICON_POSITION" == "right" ]; then
+      ICON="$NAME $ICON"
+    else
+      ICON="$ICON $NAME"
+    fi
   fi
 fi
 
