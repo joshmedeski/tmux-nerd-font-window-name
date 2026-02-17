@@ -24,6 +24,10 @@ get_yaml_value() {
   ' "$file"
 }
 
+# Allow overriding user config path via tmux option
+USER_CONFIG=$(tmux show-option -gqv @tmux-nerd-font-window-name-config-file)
+USER_CONFIG=${USER_CONFIG:-"$HOME/.config/tmux/tmux-nerd-font-window-name.yml"}
+
 # Function to retrieve a configuration value
 get_config_value() {
   local section="$1"
@@ -44,7 +48,8 @@ get_config_value() {
 main() {
   local name="$1"
   local panes="$2"
-  local user_config="${TMUX_NERD_FONT_USER_CONFIG:-$HOME/.config/tmux/tmux-nerd-font-window-name.yml}"
+  # USER_CONFIG is set at the top of the script, but allow override via env var for testing
+  local user_config="${TMUX_NERD_FONT_USER_CONFIG:-$USER_CONFIG}"
 
   # Retrieve the icon based on the name argument
   local icon

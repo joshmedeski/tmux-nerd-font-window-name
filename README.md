@@ -40,6 +40,21 @@ icons:
   cmatrix: "🤯" # add new entries that aren't included
 ```
 
+### Custom Configuration File Path
+
+By default, the plugin looks for the configuration file at:
+
+```sh
+~/.config/tmux/tmux-nerd-font-window-name.yml
+```
+
+You can override this path by adding the following line to your
+tmux.conf file:
+
+```sh
+set -g @tmux-nerd-font-window-name-config-file "/your/custom/path.yml"
+```
+
 ### Custom Placeholder Support
 
 If you prefer to define your own `automatic-rename-format`,
