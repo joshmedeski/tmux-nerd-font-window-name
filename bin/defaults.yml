@@ -2,6 +2,7 @@
 config:
   fallback-icon: "?"
   show-name: true
+  always-show-fallback-name: false
 
 icons:
   alacritty: ""
