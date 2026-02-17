@@ -10,7 +10,7 @@ source "$SCRIPT"
 
 # Helper: get expected icon from defaults.yml
 get_default_icon() {
-  yq -r ".icons[\"$1\"]" "$DEFAULTS"
+  get_yaml_value icons "$1" "$DEFAULTS"
 }
 
 set_up() {
@@ -120,16 +120,6 @@ function test_user_config_overrides_fallback_icon() {
   output="$(main some-unknown-program 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
   assert_equals "X" "$output"
-}
-
-# --- Error handling ---
-
-function test_missing_yq_exits_1_with_error_message() {
-  export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/no-show-name.yml"
-  export PATH="/usr/bin:/bin"
-  output="$(main nvim 1 2>&1)" && exit_code=$? || exit_code=$?
-  (exit "$exit_code"); assert_general_error
-  assert_contains "yq missing" "$output"
 }
 
 # --- Edge cases ---

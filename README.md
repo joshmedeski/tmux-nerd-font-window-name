@@ -10,7 +10,6 @@ The following dependencies are required in order to use this plugin:
 
 - [tmux](https://github.com/tmux/tmux)
 - [tpm](https://github.com/tmux-plugins/tpm)
-- [yq](https://github.com/mikefarah/yq) (>=4)
 
 ## Installation (via tpm)
 
