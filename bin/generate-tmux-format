@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$CURRENT_DIR/lib.sh"
+
+generate_format() {
+  local user_config="${TMUX_NERD_FONT_USER_CONFIG:-$HOME/.config/tmux/tmux-nerd-font-window-name.yml}"
+
+  # Determine which files to read (defaults first, user config overrides)
+  local files="$DEFAULT_CONFIG"
+  if [ -f "$user_config" ]; then
+    files="$DEFAULT_CONFIG $user_config"
+  fi
+
+  # Get config values
+  local fallback_icon show_name always_fallback icon_position multi_pane_icon
+  fallback_icon="$(get_config_value config fallback-icon "$user_config")"
+  show_name="$(get_config_value config show-name "$user_config")"
+  always_fallback="$(get_config_value config always-show-fallback-name "$user_config")"
+  icon_position="$(get_config_value config icon-position "$user_config")"
+  multi_pane_icon="$(get_config_value config multi-pane-icon "$user_config")"
+
+  # Build the flat tmux format string using awk
+  # Reads icon mappings from both config files (user overrides defaults),
+  # then generates flat #{?#{==:#{pane_current_command},CMD},ICON,} conditionals
+  # (constant nesting depth, avoids tmux FORMAT_LOOP_LIMIT of 100)
+  local format
+  format="$(awk \
+    -v fallback="$fallback_icon" \
+    -v show_name="$show_name" \
+    -v always_fallback="$always_fallback" \
+    -v icon_pos="$icon_position" '
+    /^[^ #]/ { current = $0; sub(/:.*/, "", current) }
+    current == "icons" && /^  [^ #]/ {
+      key = $0; sub(/:.*/, "", key); gsub(/^ +/, "", key)
+      val = $0; sub(/^[^:]*: */, "", val); gsub(/^["'"'"'"]|["'"'"'"]$/, "", val)
+      if (!(key in icons)) {
+        order[n++] = key
+      }
+      icons[key] = val
+    }
+    END {
+      # Escape # in fallback for tmux format safety
+      gsub(/#/, "##", fallback)
+
+      # Build the fallback text
+      if (show_name == "true") {
+        fb = fallback
+      } else if (always_fallback == "true") {
+        if (icon_pos == "right") {
+          fb = "#{pane_current_command} " fallback
+        } else {
+          fb = fallback " #{pane_current_command}"
+        }
+      } else {
+        fb = fallback
+      }
+
+      # Build flat conditional chain: each icon is an independent conditional
+      # with an empty false branch (constant depth of 3-4 per conditional)
+      chain = ""
+      for (i = 0; i < n; i++) {
+        k = order[i]
+        v = icons[k]
+        # Escape # in icon values for tmux format safety
+        gsub(/#/, "##", v)
+        chain = chain "#{?#{==:#{pane_current_command}," k "}," v ",}"
+      }
+
+      # Append fallback wrapper: if chain evaluates to non-empty (a match),
+      # the fallback is suppressed; if empty (no match), fallback is shown
+      result = chain "#{?" chain ",," fb "}"
+
+      # Wrap with name display if show-name is enabled
+      if (show_name == "true") {
+        if (icon_pos == "right") {
+          result = "#{pane_current_command} " result
+        } else {
+          result = result " #{pane_current_command}"
+        }
+      }
+
+      printf "%s", result
+    }
+  ' $files)"
+
+  # Add multi-pane prefix if configured
+  if [ "$multi_pane_icon" != "null" ] && [ -n "$multi_pane_icon" ]; then
+    format="#{?#{>:#{window_panes},1},${multi_pane_icon} ,}${format}"
+  fi
+
+  printf '%s' "$format"
+}
+
+# Run generate_format only when executed directly, not when sourced
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  generate_format "$@"
+fi
