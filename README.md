@@ -10,7 +10,6 @@ The following dependencies are required in order to use this plugin:
 
 - [tmux](https://github.com/tmux/tmux)
 - [tpm](https://github.com/tmux-plugins/tpm)
-- [yq](https://github.com/mikefarah/yq) (>=4)
 
 ## Installation (via tpm)
 
@@ -33,6 +32,7 @@ config:
   fallback-icon: "?" # show when no definition is found
   multi-pane-icon: "" # show when window has multiple panes (blank by default)
   show-name: true # show the window name with the icon (defaults to false)
+  always-show-fallback-name: false # always show the name alongside the fallback icon, even when show-name is false (defaults to false)
   icon-position: "left" # show the icon to the "left" or "right" of the window name (defaults to left)
 
 icons:
@@ -55,10 +55,20 @@ tmux.conf file:
 set -g @tmux-nerd-font-window-name-config-file "/your/custom/path.yml"
 ```
 
-## Contributions
+### Custom Placeholder Support
 
-Contributions are welcome! Feel free to make a pull request to submit more
-preset icon settings or improve the codebase!
+If you prefer to define your own `automatic-rename-format`,
+you can include a placeholder that lets this plugin inject its icon output.
+
+For example:
+
+```tmux
+set -g automatic-rename-format "#{window_icon} #{b:pane_current_path}"
+```
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on adding icons, running tests, and submitting pull requests.
 
 ## Intro Video
 

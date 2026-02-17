@@ -1,16 +1,28 @@
 #!/usr/bin/env bash
 
-# Check if yq command is available
-if ! command -v yq >/dev/null 2>&1; then
-  echo "$1 ⚠︎ yq missing"
-  exit 1
-fi
-
-# Define variables with arguments and config paths
-NAME="$1"
-PANES="$2"
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEFAULT_CONFIG="$CURRENT_DIR/defaults.yml"
+
+# Parse a value from a flat YAML file (section + key lookup, POSIX awk)
+get_yaml_value() {
+  local section="$1"
+  local key="$2"
+  local file="$3"
+  awk -v section="$section" -v key="$key" '
+    /^[^ #]/ { current = $0; sub(/:.*/, "", current) }
+    current == section {
+      if ($0 ~ "^  " key ":") {
+        val = $0
+        sub(/^[^:]*: */, "", val)
+        gsub(/^["'\''"]|["'\''"]$/, "", val)
+        print val
+        found = 1
+        exit
+      }
+    }
+    END { if (!found) print "null" }
+  ' "$file"
+}
 
 # Allow overriding user config path via tmux option
 USER_CONFIG=$(tmux show-option -gqv @tmux-nerd-font-window-name-config-file)
@@ -18,46 +30,77 @@ USER_CONFIG=${USER_CONFIG:-"$HOME/.config/tmux/tmux-nerd-font-window-name.yml"}
 
 # Function to retrieve a configuration value
 get_config_value() {
-  local key="$1"
+  local section="$1"
+  local key="$2"
+  local config="$3"
   local value=""
-  if [ -f "$USER_CONFIG" ]; then
-    value="$(yq -r "$key" "$USER_CONFIG")"
+  if [ -f "$config" ]; then
+    value="$(get_yaml_value "$section" "$key" "$config")"
     if [ "$value" == "null" ]; then
-      # Fallback to default config if key is not found in user config
-      value="$(yq -r "$key" "$DEFAULT_CONFIG")"
+      value="$(get_yaml_value "$section" "$key" "$DEFAULT_CONFIG")"
     fi
   else
-    value="$(yq -r "$key" "$DEFAULT_CONFIG")"
+    value="$(get_yaml_value "$section" "$key" "$DEFAULT_CONFIG")"
   fi
   echo "$value"
 }
 
-# Retrieve the icon based on the NAME argument
-ICON="$(get_config_value ".icons[\"$NAME\"]")"
+main() {
+  local name="$1"
+  local panes="$2"
+  # USER_CONFIG is set at the top of the script, but allow override via env var for testing
+  local user_config="${TMUX_NERD_FONT_USER_CONFIG:-$USER_CONFIG}"
 
-# Fallback icon if no specific icon is found
-if [ "$ICON" == "null" ] || [ -z "$ICON" ]; then
-  ICON="$(get_config_value '.config["fallback-icon"]')"
-fi
+  # Retrieve the icon based on the name argument
+  local icon
+  icon="$(get_config_value icons "$name" "$user_config")"
 
-# If multiple panes are open, add a multi-pane icon if available
-if [ "$PANES" -gt 1 ]; then
-  MULTI_PANE_ICON="$(get_config_value '.config["multi-pane-icon"]')"
-  if [ "$MULTI_PANE_ICON" != "null" ] && [ -n "$MULTI_PANE_ICON" ]; then
-    ICON="$MULTI_PANE_ICON $ICON"
+  # Fallback icon if no specific icon is found
+  local is_fallback=false
+  if [ "$icon" == "null" ] || [ -z "$icon" ]; then
+    icon="$(get_config_value config fallback-icon "$user_config")"
+    is_fallback=true
   fi
-fi
 
-# Check if the window name should be displayed and set icon position
-SHOW_NAME="$(get_config_value '.config["show-name"]')"
-if [ "$SHOW_NAME" = "true" ]; then
-  ICON_POSITION="$(get_config_value '.config["icon-position"]')"
-  if [ "$ICON_POSITION" == "right" ]; then
-    ICON="$NAME $ICON"
-  else
-    ICON="$ICON $NAME"
+  # If multiple panes are open, add a multi-pane icon if available
+  if [ "$panes" -gt 1 ]; then
+    local multi_pane_icon
+    multi_pane_icon="$(get_config_value config multi-pane-icon "$user_config")"
+    if [ "$multi_pane_icon" != "null" ] && [ -n "$multi_pane_icon" ]; then
+      icon="$multi_pane_icon $icon"
+    fi
   fi
-fi
 
-# Output the final icon
-echo "$ICON"
+  # Check if the window name should be displayed and set icon position
+  local show_name
+  show_name="$(get_config_value config show-name "$user_config")"
+  if [ "$show_name" = "true" ]; then
+    local icon_position
+    icon_position="$(get_config_value config icon-position "$user_config")"
+    if [ "$icon_position" == "right" ]; then
+      icon="$name $icon"
+    else
+      icon="$icon $name"
+    fi
+  elif [ "$is_fallback" = "true" ]; then
+    local always_show_fallback_name
+    always_show_fallback_name="$(get_config_value config always-show-fallback-name "$user_config")"
+    if [ "$always_show_fallback_name" = "true" ]; then
+      local icon_position
+      icon_position="$(get_config_value config icon-position "$user_config")"
+      if [ "$icon_position" == "right" ]; then
+        icon="$name $icon"
+      else
+        icon="$icon $name"
+      fi
+    fi
+  fi
+
+  # Output the final icon
+  echo "$icon"
+}
+
+# Run main only when executed directly, not when sourced
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "$@"
+fi

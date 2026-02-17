@@ -1,0 +1,23 @@
+name: Tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install bashunit
+        run: curl -s https://bashunit.typeddevs.com/install.sh | bash
+      - name: Run tests
+        run: ./lib/bashunit test/ --log-junit results.xml
+      - name: Test report
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: bashunit
+          path: results.xml
+          reporter: java-junit
