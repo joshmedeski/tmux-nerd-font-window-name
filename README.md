@@ -6,12 +6,12 @@ Automatically add Nerd Font support to your tmux window names!
 
 ## Requirements
 
-The following dependencies are required in order to use this plugin:
-
 - [tmux](https://github.com/tmux/tmux)
-- [tpm](https://github.com/tmux-plugins/tpm)
+- A [Nerd Font](https://www.nerdfonts.com/) installed and configured in your terminal
 
-## Installation (via tpm)
+## Installation
+
+### tpm
 
 Add the following line to your tmux configuration file:
 
@@ -21,6 +21,47 @@ set -g @plugin 'joshmedeski/tmux-nerd-font-window-name'
 
 Run `<prefix>+I` to trigger the tpm installer which will download
 and source the plugin.
+
+### Nix (flakes)
+
+Add the flake input to your configuration:
+
+```nix
+{
+  inputs = {
+    tmux-nerd-font-window-name.url = "github:joshmedeski/tmux-nerd-font-window-name";
+  };
+}
+```
+
+Then use the plugin in your tmux configuration via Home Manager:
+
+```nix
+{ inputs, pkgs, ... }:
+
+{
+  programs.tmux = {
+    enable = true;
+    plugins = [
+      inputs.tmux-nerd-font-window-name.packages.${pkgs.system}.default
+    ];
+  };
+}
+```
+
+Or using the overlay:
+
+```nix
+{
+  nixpkgs.overlays = [
+    inputs.tmux-nerd-font-window-name.overlays.default
+  ];
+
+  programs.tmux.plugins = [
+    pkgs.tmuxPlugins.tmux-nerd-font-window-name
+  ];
+}
+```
 
 ## Configuration
 
