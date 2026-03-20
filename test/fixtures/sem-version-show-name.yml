@@ -1,0 +1,5 @@
+config:
+  fallback-icon: "?"
+  show-name: true
+  icon-position: left
+  sem-version-icon: "V"

@@ -138,3 +138,41 @@ function test_fallback_name_disabled_unknown_command_shows_only_fallback_icon() 
   (exit "$exit_code"); assert_successful_code
   assert_equals "?" "$output"
 }
+
+# --- Semantic version matching ---
+
+function test_semver_three_part_returns_sem_version_icon() {
+  export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/sem-version.yml"
+  output="$(main 2.1.23 1 2>&1)" && exit_code=$? || exit_code=$?
+  (exit "$exit_code"); assert_successful_code
+  assert_equals "V" "$output"
+}
+
+function test_semver_two_part_returns_sem_version_icon() {
+  export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/sem-version.yml"
+  output="$(main 1.0 1 2>&1)" && exit_code=$? || exit_code=$?
+  (exit "$exit_code"); assert_successful_code
+  assert_equals "V" "$output"
+}
+
+function test_semver_not_matched_for_non_version() {
+  export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/sem-version.yml"
+  output="$(main node 1 2>&1)" && exit_code=$? || exit_code=$?
+  (exit "$exit_code"); assert_successful_code
+  expected="$(get_default_icon node)"
+  assert_equals "$expected" "$output"
+}
+
+function test_semver_falls_to_fallback_when_not_configured() {
+  export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/no-show-name.yml"
+  output="$(main 2.1.23 1 2>&1)" && exit_code=$? || exit_code=$?
+  (exit "$exit_code"); assert_successful_code
+  assert_equals "?" "$output"
+}
+
+function test_semver_with_show_name() {
+  export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/sem-version-show-name.yml"
+  output="$(main 2.1.23 1 2>&1)" && exit_code=$? || exit_code=$?
+  (exit "$exit_code"); assert_successful_code
+  assert_equals "V 2.1.23" "$output"
+}

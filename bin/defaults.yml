@@ -3,6 +3,7 @@ config:
   fallback-icon: "?"
   show-name: true
   always-show-fallback-name: false
+  sem-version-icon: "null"
 
 icons:
   alacritty: ""
