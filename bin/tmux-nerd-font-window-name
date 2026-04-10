@@ -16,8 +16,14 @@ main() {
   # Fallback icon if no specific icon is found
   local is_fallback=false
   if [ "$icon" == "null" ] || [ -z "$icon" ]; then
-    icon="$(get_config_value config fallback-icon "$user_config")"
-    is_fallback=true
+    local sem_version_icon
+    sem_version_icon="$(get_config_value config sem-version-icon "$user_config")"
+    if [[ "$name" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] && [ "$sem_version_icon" != "null" ] && [ -n "$sem_version_icon" ]; then
+      icon="$sem_version_icon"
+    else
+      icon="$(get_config_value config fallback-icon "$user_config")"
+      is_fallback=true
+    fi
   fi
 
   # If multiple panes are open, add a multi-pane icon if available

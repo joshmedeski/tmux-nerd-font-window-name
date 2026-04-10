@@ -1,0 +1,4 @@
+config:
+  fallback-icon: "?"
+  show-name: false
+  sem-version-icon: "V"

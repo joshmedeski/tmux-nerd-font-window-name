@@ -151,6 +151,25 @@ function test_format_contains_git_icon() {
 
 # --- No user config file ---
 
+# --- Semantic version matching ---
+
+function test_format_contains_semver_regex_when_configured() {
+  export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/sem-version.yml"
+  local output
+  output="$(generate_format)"
+  assert_contains "#{m/r:" "$output"
+  assert_contains ",V,}" "$output"
+}
+
+function test_format_no_semver_regex_when_not_configured() {
+  export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/no-show-name.yml"
+  local output
+  output="$(generate_format)"
+  assert_not_contains "#{m/r:" "$output"
+}
+
+# --- No user config file ---
+
 function test_format_no_user_config_uses_defaults() {
   export TMUX_NERD_FONT_USER_CONFIG="/nonexistent/path/config.yml"
   local output

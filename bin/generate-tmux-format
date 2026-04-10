@@ -13,12 +13,13 @@ generate_format() {
   fi
 
   # Get config values
-  local fallback_icon show_name always_fallback icon_position multi_pane_icon
+  local fallback_icon show_name always_fallback icon_position multi_pane_icon sem_version_icon
   fallback_icon="$(get_config_value config fallback-icon "$user_config")"
   show_name="$(get_config_value config show-name "$user_config")"
   always_fallback="$(get_config_value config always-show-fallback-name "$user_config")"
   icon_position="$(get_config_value config icon-position "$user_config")"
   multi_pane_icon="$(get_config_value config multi-pane-icon "$user_config")"
+  sem_version_icon="$(get_config_value config sem-version-icon "$user_config")"
 
   # Build the flat tmux format string using awk
   # Reads icon mappings from both config files (user overrides defaults),
@@ -29,7 +30,8 @@ generate_format() {
     -v fallback="$fallback_icon" \
     -v show_name="$show_name" \
     -v always_fallback="$always_fallback" \
-    -v icon_pos="$icon_position" '
+    -v icon_pos="$icon_position" \
+    -v sem_ver_icon="$sem_version_icon" '
     /^[^ #]/ { current = $0; sub(/:.*/, "", current) }
     current == "icons" && /^  [^ #]/ {
       key = $0; sub(/:.*/, "", key); gsub(/^ +/, "", key)
@@ -67,9 +69,17 @@ generate_format() {
         chain = chain "#{?#{==:#{pane_current_command}," k "}," v ",}"
       }
 
-      # Append fallback wrapper: if chain evaluates to non-empty (a match),
+      # Build semver conditional if configured
+      sem_ver = ""
+      if (sem_ver_icon != "null" && sem_ver_icon != "") {
+        gsub(/#/, "##", sem_ver_icon)
+        sem_ver = "#{?#{m/r:^[0-9]+\\.[0-9]+(\\.[0-9]+)?$,#{pane_current_command}}," sem_ver_icon ",}"
+      }
+
+      # Append fallback wrapper: if chain or semver evaluates to non-empty (a match),
       # the fallback is suppressed; if empty (no match), fallback is shown
-      result = chain "#{?" chain ",," fb "}"
+      combined = chain sem_ver
+      result = combined "#{?" combined ",," fb "}"
 
       # Wrap with name display if show-name is enabled
       if (show_name == "true") {
