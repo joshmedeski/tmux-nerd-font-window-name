@@ -17,6 +17,7 @@ get_yaml_value() {
       if ($0 ~ "^  " key ":") {
         val = $0
         sub(/^[^:]*: */, "", val)
+        sub(/ (#.*)$/, "", val)
         gsub(/^["'\''"]|["'\''"]$/, "", val)
         print val
         found = 1
