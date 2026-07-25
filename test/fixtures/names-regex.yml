@@ -1,0 +1,7 @@
+config:
+  show-name: true
+  icon-position: left
+icons:
+  devserver: "D"
+names-regex:
+  npm.*dev: devserver

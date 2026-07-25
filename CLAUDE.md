@@ -10,40 +10,49 @@ tmux-nerd-font-window-name is a tmux plugin (installed via tpm) that automatical
 
 - **Run tests:** `make test`
 - **Run tests directly:** `./lib/bashunit test/`
-- **Run tests with coverage:** `./lib/bashunit test/ --coverage --coverage-paths bin/tmux-nerd-font-window-name --coverage-report coverage/lcov.info`
-- **Install bashunit (test framework):** `curl -s https://bashunit.typeddevs.com/install.sh | bash` (installs to `lib/bashunit`)
+- **Run tests with coverage:** `./lib/bashunit test/ --coverage --coverage-paths bin/tmux-nerd-font-window-name,bin/generate-tmux-format,bin/lib.sh,bin/cache-config --coverage-report coverage/lcov.info`
+- **Install bashunit (test framework):** `curl -sL https://bashunit.com/install.sh | bash` (installs to `lib/bashunit`)
 
 ## Architecture
 
-The plugin has two main components:
+The plugin has four components:
 
-1. **`tmux-nerd-font-window-name.tmux`** - Entry point loaded by tpm. Sets `automatic-rename-format` to call the main script. Supports a `#{window_icon}` placeholder for custom formats.
+1. **`tmux-nerd-font-window-name.tmux`** - Entry point loaded by tpm. Generates the config cache, then sets `automatic-rename-format`: a `#()` call to the main script when the config has regex sections (`names-regex`/`icons-regex`), otherwise the static format from `bin/generate-tmux-format`. Supports a `#{window_icon}` placeholder for custom formats (the original template is saved to the `@tmux-nerd-font-window-name-template` tmux option).
 
-2. **`bin/tmux-nerd-font-window-name`** - Main script. Takes `pane_current_command` and `window_panes` as arguments, looks up the icon, and outputs the formatted string.
+2. **`bin/tmux-nerd-font-window-name`** - Main script, run by tmux on every rename. Takes `pane_current_command`, `window_panes`, `pane_pid`, `window_id` as arguments, resolves the icon/name, and outputs the formatted string.
+
+3. **`bin/cache-config`** - Cache generator (sourced, not executed). `generate_cache(user_config)` parses both YAML files once and writes a sourceable cache file to `$XDG_CACHE_HOME/tmux-nerd-font-window-name/config.sh`: `CFG_*` option variables, an `icon_for()` case function, ordered `REGEX_{NAMES,ICONS}_{PATTERNS,VALUES}` arrays, and `CACHE_SOURCE_CONFIG` (the config path it was built from). `load_cache` resets previously loaded state, then sources the cache.
+
+4. **`bin/lib.sh`** - Shared helpers: awk YAML parsing (`get_yaml_value`, `yaml_section_pairs`, `merged_section_pairs`), `shquote` (single-quote escaping for generated code), `child_cmdlines` (one `ps` call listing pane child command lines, gated by argv[0] basename == pane command), `match_cached_regex` (first-match-wins loop over the cached regex arrays using bash `=~`, POSIX ERE).
 
 ### Config Resolution
 
-The script uses a custom `get_yaml_value()` awk-based parser for flat YAML (no `yq` dependency). Config lookup follows a two-level cascade:
+**User config** (`~/.config/tmux/tmux-nerd-font-window-name.yml`, overridable via `TMUX_NERD_FONT_USER_CONFIG` env var) is checked first
+**Default config** (`bin/defaults.yml`) is the fallback
 
-- **User config** (`~/.config/tmux/tmux-nerd-font-window-name.yml`, overridable via `TMUX_NERD_FONT_USER_CONFIG` env var) is checked first
-- **Default config** (`bin/defaults.yml`) is the fallback
-
-`get_config_value(section, key, user_config)` checks user config, then defaults.
+Flat YAML parsed with awk (no `yq` dependency). Two-level cascade resolved **at cache generation time**: user config (`~/.config/tmux/tmux-nerd-font-window-name.yml`, overridable via the `@tmux-nerd-font-window-name-config-file` tmux option or `TMUX_NERD_FONT_USER_CONFIG` env var) overrides `bin/defaults.yml`. At rename time there is no YAML parsing — `main()` sources the cache and regenerates it only when it's missing or `CACHE_SOURCE_CONFIG` doesn't match the current config path (this mismatch check is what makes test fixtures work).
 
 ### Output Logic in `main()`
 
-The `main()` function applies configuration in this order:
-1. Look up icon by command name
-2. If not found, use `fallback-icon` (and set `is_fallback=true`)
-3. If multi-pane (panes > 1), prepend `multi-pane-icon`
-4. If `show-name: true`, append/prepend the command name based on `icon-position`
-5. If fallback and `always-show-fallback-name: true`, show name alongside fallback icon
+1. Load the cache (regenerate if stale/missing)
+2. If regex rules exist, get child command lines (`child_cmdlines`) and match `names-regex` (renames) and `icons-regex` (sets icon) against them — both against the *original* pane command
+3. Icon resolution precedence: regex icon → exact `icon_for(name)` lookup
+4. If not found, use sem-version icon (for `1.2.3`-style names) or `fallback-icon` (sets `is_fallback=true`)
+5. If multi-pane (panes > 1), prepend `multi-pane-icon`
+6. If `show-name: true` (or fallback + `always-show-fallback-name: true`), append/prepend the name per `icon-position`
+7. Stale-name self-heal: tmux displays `#()` output one rename cycle late, so if the displayed window name doesn't contain the computed result, the script renames the window directly (resolving the user's `#{window_icon}` template if set) and re-enables `automatic-rename`
 
 ## Testing
 
-Tests use [bashunit](https://bashunit.typeddevs.com/). The test file sources the main script to call `main()` directly. Each test sets `TMUX_NERD_FONT_USER_CONFIG` to a fixture YAML in `test/fixtures/` to control config without touching real user files.
+Tests use [bashunit](https://bashunit.com). Test files: `tmux_nerd_font_window_name_test.sh` (end-to-end through `main()`, including regex scenarios), `lib_test.sh` (lib.sh helpers), `cache_config_test.sh` (cache generation/loading), `generate_tmux_format_test.sh` (static format).
 
-Test fixtures are minimal YAML files that each test a specific config combination (show-name, icon-position, fallback-name, multi-pane, override).
+Conventions and traps:
+
+- Each test sets `TMUX_NERD_FONT_USER_CONFIG` to a fixture YAML in `test/fixtures/`; the cache mismatch-regen makes this work without extra setup.
+- Any test file that sources `cache-config` (directly or via the main script) must `export XDG_CACHE_HOME="$(mktemp -d)"` **before** the `source` line, or tests write to the real user cache.
+- bashunit runs each test in a subshell: use `$BASHPID`, not `$$`, for the current test process — and capture it into a variable *before* any `$(...)` (inside a command substitution `BASHPID` is the substitution's own subshell).
+- Regex tests spawn a real fake child process: `bash -c 'exec -a "npm run dev" sleep 5' &`.
+- Coverage numbers from bashunit are unreliable for sourced files — treat the coverage table as a file checklist, not a metric. `make test` (with coverage) is ~10x slower than `./lib/bashunit test/`.
 
 ## Contributing
 
