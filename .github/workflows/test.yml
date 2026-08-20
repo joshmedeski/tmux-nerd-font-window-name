@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install bashunit
-        run: curl -s https://bashunit.typeddevs.com/install.sh | bash
+        run: curl -sL https://bashunit.com/install.sh | bash
       - name: Run tests
         run: ./lib/bashunit test/ --log-junit results.xml
       - name: Test report

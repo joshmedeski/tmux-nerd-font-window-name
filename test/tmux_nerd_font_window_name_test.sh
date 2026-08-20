@@ -5,6 +5,9 @@ SCRIPT="$SCRIPT_DIR/tmux-nerd-font-window-name"
 FIXTURES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/fixtures" && pwd)"
 DEFAULTS="$SCRIPT_DIR/defaults.yml"
 
+# Keep the config cache away from the user's real cache directory
+export XDG_CACHE_HOME="$(mktemp -d)"
+
 # Source the script to make main() available for coverage tracking
 source "$SCRIPT"
 
@@ -175,4 +178,55 @@ function test_semver_with_show_name() {
   output="$(main 2.1.23 1 2>&1)" && exit_code=$? || exit_code=$?
   (exit "$exit_code"); assert_successful_code
   assert_equals "V 2.1.23" "$output"
+}
+
+# --- regex matching (names-regex / icons-regex) ---
+
+spawn_fake_child() {
+  bash -c 'exec -a "npm run dev" sleep 5' &
+  _FAKE_CHILD_PID=$!
+  sleep 0.2
+}
+
+kill_fake_child() {
+  kill "$_FAKE_CHILD_PID" 2>/dev/null
+  wait "$_FAKE_CHILD_PID" 2>/dev/null
+}
+
+function test_regex_icon_beats_exact_icon_lookup() {
+  export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/icons-regex.yml"
+  # capture BASHPID BEFORE the $() 
+  # BASHPID is the substitution's own subshell, not this test shell
+  local pid="$BASHPID"
+  spawn_fake_child
+  output="$(main npm 1 "$pid" 2>&1)" && exit_code=$? || exit_code=$?
+  kill_fake_child
+  (exit "$exit_code"); assert_successful_code
+  assert_equals "D" "$output"
+}
+
+function test_exact_icon_used_when_no_child_matches_regex() {
+  export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/icons-regex.yml"
+  # no fake child spawned: nothing for the regex to match
+  local pid="$BASHPID"
+  output="$(main npm 1 "$pid" 2>&1)" && exit_code=$? || exit_code=$?
+  (exit "$exit_code"); assert_successful_code
+  assert_equals "N" "$output"
+}
+
+function test_names_regex_renames_and_resolves_icon_from_new_name() {
+  export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/names-regex.yml"
+  local pid="$BASHPID"
+  spawn_fake_child
+  output="$(main npm 1 "$pid" 2>&1)" && exit_code=$? || exit_code=$?
+  kill_fake_child
+  (exit "$exit_code"); assert_successful_code
+  assert_equals "D devserver" "$output"
+}
+
+function test_regex_ignored_when_pane_pid_empty() {
+  export TMUX_NERD_FONT_USER_CONFIG="$FIXTURES_DIR/icons-regex.yml"
+  output="$(main npm 1 "" 2>&1)" && exit_code=$? || exit_code=$?
+  (exit "$exit_code"); assert_successful_code
+  assert_equals "N" "$output"
 }

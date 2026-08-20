@@ -1,0 +1,7 @@
+icons:
+  nvim: "N"
+  ssh: S  # trailing comment to strip
+  'quoted-key': 'quoted-val'
+empty-section:
+config:
+  show-name: true

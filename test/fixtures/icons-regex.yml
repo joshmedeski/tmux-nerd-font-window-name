@@ -1,0 +1,6 @@
+config:
+  show-name: false
+icons:
+  npm: "N"
+icons-regex:
+  npm.*dev: "D"

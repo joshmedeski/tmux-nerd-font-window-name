@@ -1,62 +1,96 @@
 #!/usr/bin/env bash
 
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$CURRENT_DIR/lib.sh"
+source "$CURRENT_DIR/cache-config"   # also sources lib.sh
 
 main() {
   local name="$1"
   local panes="$2"
+  local pane_pid="$3"
+  local window_id="$4"
   # USER_CONFIG is set at the top of the script, but allow override via env var for testing
   local user_config="${TMUX_NERD_FONT_USER_CONFIG:-$USER_CONFIG}"
 
-  # Retrieve the icon based on the name argument
+  # Load the precomputed config cache; (re)generate when it is missing
+  # or was built from a different config file
+  if ! load_cache || [ "$CACHE_SOURCE_CONFIG" != "$user_config" ]; then
+    generate_cache "$user_config"
+    load_cache
+  fi
+
+  # Match name and icon regexes against the child process command lines,
+  # using the original pane command so both see the same gate
+  local cmdlines="" regex_name="" regex_icon=""
+  if [ "${#REGEX_NAMES_PATTERNS[@]}" -gt 0 ] || [ "${#REGEX_ICONS_PATTERNS[@]}" -gt 0 ]; then
+    cmdlines="$(child_cmdlines "$name" "$pane_pid")"
+  fi
+  if [ -n "$cmdlines" ]; then
+    regex_name="$(match_cached_regex REGEX_NAMES "$cmdlines")"
+    regex_icon="$(match_cached_regex REGEX_ICONS "$cmdlines")"
+  fi
+
+  if [ -n "$regex_name" ]; then
+    name="$regex_name"
+  fi
+
   local icon
-  icon="$(get_config_value icons "$name" "$user_config")"
+  if [ -n "$regex_icon" ]; then
+    icon="$regex_icon"
+  else
+    icon="$(icon_for "$name")"
+  fi
 
   # Fallback icon if no specific icon is found
   local is_fallback=false
   if [ "$icon" == "null" ] || [ -z "$icon" ]; then
-    local sem_version_icon
-    sem_version_icon="$(get_config_value config sem-version-icon "$user_config")"
+    local sem_version_icon="${CFG_SEM_VERSION_ICON:-null}"
     if [[ "$name" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] && [ "$sem_version_icon" != "null" ] && [ -n "$sem_version_icon" ]; then
       icon="$sem_version_icon"
     else
-      icon="$(get_config_value config fallback-icon "$user_config")"
+      icon="${CFG_FALLBACK_ICON:-null}"
       is_fallback=true
     fi
   fi
 
   # If multiple panes are open, add a multi-pane icon if available
   if [ "$panes" -gt 1 ]; then
-    local multi_pane_icon
-    multi_pane_icon="$(get_config_value config multi-pane-icon "$user_config")"
+    local multi_pane_icon="${CFG_MULTI_PANE_ICON:-null}"
     if [ "$multi_pane_icon" != "null" ] && [ -n "$multi_pane_icon" ]; then
       icon="$multi_pane_icon $icon"
     fi
   fi
 
   # Check if the window name should be displayed and set icon position
-  local show_name
-  show_name="$(get_config_value config show-name "$user_config")"
-  if [ "$show_name" = "true" ]; then
-    local icon_position
-    icon_position="$(get_config_value config icon-position "$user_config")"
-    if [ "$icon_position" == "right" ]; then
+  local show_the_name=false
+  if [ "${CFG_SHOW_NAME:-false}" = "true" ]; then
+    show_the_name=true
+  elif [ "$is_fallback" = "true" ] && [ "${CFG_ALWAYS_SHOW_FALLBACK_NAME:-false}" = "true" ]; then
+    show_the_name=true
+  fi
+  if [ "$show_the_name" = "true" ]; then
+    if [ "${CFG_ICON_POSITION:-left}" == "right" ]; then
       icon="$name $icon"
     else
       icon="$icon $name"
     fi
-  elif [ "$is_fallback" = "true" ]; then
-    local always_show_fallback_name
-    always_show_fallback_name="$(get_config_value config always-show-fallback-name "$user_config")"
-    if [ "$always_show_fallback_name" = "true" ]; then
-      local icon_position
-      icon_position="$(get_config_value config icon-position "$user_config")"
-      if [ "$icon_position" == "right" ]; then
-        icon="$name $icon"
+  fi
+
+  # tmux displays #() output one rename cycle late: at the moment a command
+  # starts/exits it still shows the previous run's cached output. If the
+  # displayed name is stale, set it directly, then re-enable automatic-rename
+  if [ -n "$window_id" ]; then
+    local current_name
+    current_name="$(tmux display-message -p -t "$window_id" '#{window_name}')"
+    if [[ "$current_name" != *"$icon"* ]]; then
+      local template new_name
+      template="$(tmux show-option -gqv @tmux-nerd-font-window-name-template)"
+      if [ -n "$template" ]; then
+        new_name="$(tmux display-message -p -t "$window_id" "${template//'#{window_icon}'/$icon}")"
       else
-        icon="$icon $name"
+        new_name="$icon"
       fi
+      { tmux rename-window -t "$window_id" "$new_name" &&
+          tmux set-option -w -t "$window_id" automatic-rename on; } >/dev/null 2>&1 &
     fi
   fi
 

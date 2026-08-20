@@ -79,6 +79,12 @@ config:
 icons:
   zsh: "" # overwrite with your own symbol (Nerd Font icon, emoji, whatever!)
   cmatrix: "🤯" # add new entries that aren't included
+
+icons-regex:
+  node.*codex: ""
+
+names-regex:
+  node.*codex: codex
 ```
 
 ### Custom Configuration File Path
