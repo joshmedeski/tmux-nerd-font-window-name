@@ -17,7 +17,7 @@ tmux-nerd-font-window-name is a tmux plugin (installed via tpm) that automatical
 
 The plugin has four components:
 
-1. **`tmux-nerd-font-window-name.tmux`** - Entry point loaded by tpm. Generates the config cache, then sets `automatic-rename-format`: a `#()` call to the main script when the config has regex sections (`names-regex`/`icons-regex`), otherwise the static format from `bin/generate-tmux-format`. Supports a `#{window_icon}` placeholder for custom formats (the original template is saved to the `@tmux-nerd-font-window-name-template` tmux option).
+1. **`tmux-nerd-font-window-name.tmux`** - Entry point loaded by tpm. Generates the config cache, then sets `automatic-rename-format` to a `#()` call to the main script, wrapped in a conditional that falls back to `#{pane_current_command}` while the job's output is unavailable — tmux runs `#()` jobs asynchronously, expanding to nothing until output arrives and to `<'<command>' not ready>` after one second, so without the fallback the window name flashes blank or shows tmux's placeholder text. Supports a `#{window_icon}` placeholder for custom formats (the original template is saved to the `@tmux-nerd-font-window-name-template` tmux option).
 
 2. **`bin/tmux-nerd-font-window-name`** - Main script, run by tmux on every rename. Takes `pane_current_command`, `window_panes`, `pane_pid`, `window_id` as arguments, resolves the icon/name, and outputs the formatted string.
 
@@ -44,13 +44,14 @@ Flat YAML parsed with awk (no `yq` dependency). Two-level cascade resolved **at 
 
 ## Testing
 
-Tests use [bashunit](https://bashunit.com). Test files: `tmux_nerd_font_window_name_test.sh` (end-to-end through `main()`, including regex scenarios), `lib_test.sh` (lib.sh helpers), `cache_config_test.sh` (cache generation/loading), `generate_tmux_format_test.sh` (static format).
+Tests use [bashunit](https://bashunit.com). Test files: `tmux_nerd_font_window_name_test.sh` (end-to-end through `main()`, including regex scenarios), `lib_test.sh` (lib.sh helpers), `cache_config_test.sh` (cache generation/loading), `generate_tmux_format_test.sh` (static format), `entry_point_test.sh` (the `automatic-rename-format` the `.tmux` file installs, via a fake `tmux` on `PATH`).
 
 Conventions and traps:
 
 - Each test sets `TMUX_NERD_FONT_USER_CONFIG` to a fixture YAML in `test/fixtures/`; the cache mismatch-regen makes this work without extra setup.
 - Any test file that sources `cache-config` (directly or via the main script) must `export XDG_CACHE_HOME="$(mktemp -d)"` **before** the `source` line, or tests write to the real user cache.
 - bashunit runs each test in a subshell: use `$BASHPID`, not `$$`, for the current test process — and capture it into a variable *before* any `$(...)` (inside a command substitution `BASHPID` is the substitution's own subshell).
+- `entry_point_test.sh` runs the entry point in a subshell with a stub `tmux` that records its arguments; it asserts on format structure, so it needs updating whenever the format's shape changes.
 - Regex tests spawn a real fake child process: `bash -c 'exec -a "npm run dev" sleep 5' &`.
 - Coverage numbers from bashunit are unreliable for sourced files — treat the coverage table as a file checklist, not a metric. `make test` (with coverage) is ~10x slower than `./lib/bashunit test/`.
 
