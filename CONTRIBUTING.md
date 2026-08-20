@@ -16,7 +16,7 @@ Thanks for your interest in contributing to tmux-nerd-font-window-name! Pull req
 
 ## Project Structure
 
-- `tmux-nerd-font-window-name.tmux` - Entry point loaded by tpm: generates the config cache and sets `automatic-rename-format`
+- `tmux-nerd-font-window-name.tmux` - Entry point loaded by tpm: generates the config cache and sets `automatic-rename-format` (with a `#{pane_current_command}` fallback while the `#()` job has no output yet)
 - `bin/tmux-nerd-font-window-name` - Main script that resolves icons on each rename
 - `bin/cache-config` - Generates a sourceable config cache at plugin load (`generate_cache`/`load_cache`), so no YAML is parsed at rename time
 - `bin/lib.sh` - Shared helpers: YAML parsing, `shquote`, child-process listing, cached regex matching
