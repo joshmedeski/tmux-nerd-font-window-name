@@ -47,7 +47,7 @@ main() {
     if [[ "$name" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] && [ "$sem_version_icon" != "null" ] && [ -n "$sem_version_icon" ]; then
       icon="$sem_version_icon"
     else
-      icon="${CFG_FALLBACK_ICON:-null}"
+      icon="${CFG_FALLBACK_ICON-null}"
       is_fallback=true
     fi
   fi
@@ -69,9 +69,9 @@ main() {
   fi
   if [ "$show_the_name" = "true" ]; then
     if [ "${CFG_ICON_POSITION:-left}" == "right" ]; then
-      icon="$name $icon"
+      icon="$name${icon:+ $icon}"
     else
-      icon="$icon $name"
+      icon="${icon:+$icon }$name"
     fi
   fi
 
